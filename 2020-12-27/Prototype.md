@@ -43,6 +43,7 @@ console.log(laptop2.ram); //16
 ## 2. how does it work?
 function을 선언/할당하면 prototype이라는 객체가 항상 그 속성으로 같이 생성된다. 이 prototype에 우리는 cpu와 ram을 속성으로 저장했고, 함수 생성자를 통해 생성된 객체(laptop1)의 __proto__에는 cpu와 ram을 포함한 Object가 할당되어 있다.
 즉 객체가 생성될시 그 속성인 __proto__는 생성자의 prototype과 연결되어 있다는 뜻이며 따라서 객체가 이미 생성된 이후일 지라도 해당 생성자의 prototype에 속성을 추가하면 연결된 모든 객체는 추가된 속성을 접근 할 수 있다.
+
 ![이후 추가](https://user-images.githubusercontent.com/39623897/103169504-87200080-487f-11eb-8552-e6db35d449df.JPG)
 
 ## 3. prototype chain
