@@ -49,8 +49,11 @@ Ip 주소를 통해 가장 최적의 경로를 확인하고 그 방향에 위치
 
 ## 참고자료
 [TCP/IP 원리](https://www.youtube.com/watch?v=W9uosPORF8Y&t=479s)
+
 [네트워크 계층으로 알아보는 인터넷의 원리](https://www.youtube.com/watch?v=6jo2OYPK7k0&t=294s)
+
 [TCP/IP 4계층](https://ryusae.tistory.com/4)
+
 [네트워크 상식 정리](https://blog.naver.com/park30420/221973149468)
 
 
