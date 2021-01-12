@@ -18,7 +18,7 @@ PC 혹은 디바이스에 연결된 LAN 혹은 WIFI를 통해 생성된 사설 I
 
 1 Layer. Network Access Layer: Ethernet, Wifi, 5G...
 
-## 5계층
+## 5계층 => Update된 TCP/IP의 새로운 계층으로 실제로 최근에는 이 모델을 더 많이 따른 다고하여 기술.
 5. Layer. Application Layer : http, stp, ftp ...
 4. Layer. Transpoprt Layer : TCP
 3. Layer. Network Layer : Ip
@@ -26,10 +26,45 @@ PC 혹은 디바이스에 연결된 LAN 혹은 WIFI를 통해 생성된 사설 I
 1. Layer. Physical Layer: 전선은 아날로그 신호밖에 전송하지 못한다. 디지털신호를 만들어내는 컴퓨터를 아날로그 신호로 바꾸어 전송하고 
 전달받은 아날로그 신호는 디지털 신호로 바꾸어 주는 역할을 담당하는 레이어이다.
 
+### 4. Transport Layer:
+Port를 확인해서 정확한 프로세스로 데이터를 전달한다.
+
+#### 4.1. TCP(Transmission Control Protocol): 
+TCP는 신뢰성있는 데이터를 누락없이 해당 프로세스로 보내기 위해 고안된 통신 규약이다.
+왜 이러한 방법이 고안되었을까? 예를들어 발신자가 데이터를 송신하는 중 중 알 수 없는 이유로 그 데이터는 수신자에게 도착하지 않았다.
+데이터 누락이 발생한 것이다. 실제로 라우터가 처리할 수 있는 한계치를 넘어갔을 경우 이러한 일이 발생 할 수 있다. 따라서 이를 해결하기 위해
+TCP는 3-Way Handshake라는 절차를 통해 데이터를 주고 받게된다.
+##### 4.1.1 3-Way Handshake
+Client                 Server
+     1.------SYN------>
+      <----SYN/ACK-----2.
+     3.------ACK------>
+###### 4.1.1.1 flag
+TCP에서 주고 받는 Segment는 TCP header와 Data로 나누어지는데 TCP header에는 송수신자의 PORT 번호와 송수신시 필요한 9가지의 플래그가 있습니다. 9가지 플래그는 각 역할이 정해져있으며 여기서는 SYN, ACK만 다루겠습니다.  
+- SYN(Syncronize): 단어 뜻 그대로 Client와 Server 사이에 연결을 위한 플래그입니다.
+- ACK(Acknowledgement): 정상적으로 데이터를 받았음을 알리기 위한 플래그입니다. 
+##### 4.1.2 연결 과정
+- 1. 위의 그림을 보면 Client가 SYN을 SERVER로 넘겨주게 되는데 Server는 이 SYN에 해당하는 데이터가 1인지 확인하여 Client가 연결을 원하는지 알아차립니다.
+- 2. 위의 그림을 보면 Server는 SYN/ACK을 보내게 되는데, 그 이유는 SERVER도 SYN을 1로 설정한 TCP Header를 Client로 보내서 Server 또한 통신하고 싶다는 메세지를 보내고 이와 함께 ACK을 보내서 이전에 Client가 SERVER와 통신하고 싶다고 보낸 메세지(데이터) 또한 잘 받았다고 알리게 되는 것 입니다.  
+- 3. 위의 그림을 보면 다시 CLinet가 Server에게 ACK을 보냅니다. Client가 Server의 SYN/ACK을 잘 받았다고 알리기 위해서입니다.
+이 3가지 단계를 거치면 Client와 Server 사이에 연결이 수립되고, 그 이후로는 아래와 같이 Segment를 보내고 ACK을 보내기를 반복합니다.
+Client                 Server
+     1.----Segment---->
+      <------ACK------2.
+     3.----Segment---->
+##### 4.1.3 TCP의 장점 정리
+1. 신뢰성 및 흐름제어(Flow Control)
+2. 혼잡제어(Congestion Control)
+##### 4.1.3 TCP의 문제점
+TCP는 데이터의 신뢰성을 보장하지만 수신속도가 떨어지는 단점이 있고, 경우에 따라 조금 손상된 데이터가 전송되어도 상관없는 동영상 스트리밍같은
+데이터 송수신 과정에서는 TCP를 이용하면 조금 비효율적일 수 있습니다. 그래서 그 대안으로 UDP를 사용한다.
+
+#### 4.2. UDP
+
 ### 예제(네이버에서 아이디를 입력하고 로그인 버튼을 클릭했을 때, PC[client]와 SERVER의 데이터 송수신 과정[웹 페이지 전송등])
 
 #### 용어정리
-##### 데이터 명칭
+##### 데이터 단위(PDU[Protocol Data Unit])
 - data: 4 Layer Apllication Layer 에서 http 프로토콜에 의해 http 헤더와 바디 형태로 데이터가 만들어진다. 헤더에는 GET/POST 메소드와 URL 등의 메타정보가 담겨 있다.
 - segment: 3 Layer Transport Layer 에서 TCP 프로토콜에 의해 4Layer에서 만들어진 데이터 앞에 TCP 헤더가 붙는다. TCP 헤더에는 클라이언트와 서버의
 port 넘버가 담겨있다. 이렇게 만들어진 데이터를 "Segment" 라고 한다.
@@ -63,6 +98,7 @@ Ip 주소를 통해 가장 최적의 경로를 확인하고 그 방향에 위치
 
 [네트워크 상식 정리](https://blog.naver.com/park30420/221973149468)
 
+[TCP](https://namu.wiki/w/TCP)
 
 
 
