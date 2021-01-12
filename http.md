@@ -23,9 +23,21 @@ HTTP/1.1 버전의 통신 규약과 함께 GET 방식으로 localhost:8000(호�
 ![image](https://user-images.githubusercontent.com/39623897/104270366-b3708980-54db-11eb-8125-d9e1cdb2b342.png)
 - 출처: [HTTP Messages-MDN](https://developer.mozilla.org/en-US/docs/Web/HTTP/Messages)
 ### Request Headers
-1. Start line(Request line): Method(GET), Request file(coupon_210112.html), Protocol(사용할 HTTP 버전 => HTTP/1.1)
-2. HTTP Headers(Request Headers): HOST(요청할 서버의 주소 => 127.0.0.1:8080), User-Agent(웹 브라우저 정보), Accept-Encoding(지원하는 압축방식), [If-Modified-Since](#참고)&#91;1&#93;(이전에 Response 받은 정보를 다시 Reqeust해야 할 때 이 정보가 마지막으로 수정된 날짜를 기준으로 변화가 있는지 확인하여 없다면 304 Response(Not Modified)를 보내어 재활용하기 위한 정보) 
+1. Start line(Request line): Method(GET/POST), Request file(coupon_210112.html), Protocol(사용할 HTTP 버전 => HTTP/1.1)
+2. HTTP Headers(Request Headers): 대표적으로 다음과 같은 내용들을 포함한다. 
+- HOST: 요청할 서버의 주소 ex) 127.0.0.1:8080 
+- User-Agent: 웹 브라우저 정보
+- Accept-Encoding: 웹 브라우저가 지원하는 압축방식(데이터가 클 경우 서버는 이 지원 방식으로 압축해야한다.)
+- [If-Modified-Since](#참고)&#91;1&#93;: 이전에 Response 받은 정보를 다시 Reqeust해야 할 때 이 정보가 마지막으로 수정된 날짜를 포함하여 서버에 전송한다. 서버는 이 날짜를 기준으로 요청받은 정보(파일등)에 변화가 있는지 확인하여 없다면 304 Redirection(Not Modified)를 보낸다. 즉 기본 데이터를 재활용하기 위한 정보이다.
 3. Blank: 헤더와 바디를 구분하기 위한 Blank
-4. Body: 전송할 정보(내용
+4. Body: 전송할 정보
 
+### Responses Headers
+1. Start line(status): rotocol(사용할 HTTP 버전 => HTTP/1.1), status(200 ok 등)
+2. HTTP Headers(Response Headers): 대표적으로 다음과 같은 내용들을 포함한다.
+- Content-Type: text/html, image/jpg(브라우저는 Content-Type을 통해 어떠한 타입의 데이터인지 확인하고 그 데이터를 해석한다.)
+- Content-Length: 컨텐츠의 크기(사이즈) byte단위
+- Content-Encoding: 압축형식(gzip 등의 형식으로 압축해서 브라우저가 이 방식을 디코딩해야 한다고 알려준다.
+- Last-Modified: 마지막으로 언제 수정되었는지 알려주는 내용.
 ##### 참고
+- &#91;1&#93; [If-Modified-Since](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-Modified-Since)
