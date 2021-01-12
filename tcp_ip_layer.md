@@ -18,6 +18,13 @@ PC 혹은 디바이스에 연결된 LAN 혹은 WIFI를 통해 생성된 사설 I
 
 1 Layer. Network Access Layer: Ethernet, Wifi, 5G...
 
+## 5계층
+5. Layer. Application Layer : http, stp, ftp ...
+4. Layer. Transpoprt Layer : TCP
+3. Layer. Network Layer : Ip
+2. Layer. DataLink Layer: 같은 네트워크에 속한 여러 대의 컴퓨터(스위치로 연결된 컴퓨터들)들이 데이터를 주고 받기 위해 필요한 레이어이다.
+1. Layer. Physical Layer: 전선은 아날로그 신호밖에 전송하지 못한다. 디지털신호를 만들어내는 컴퓨터를 아날로그 신호로 바꾸어 전송하고 
+전달받은 아날로그 신호는 디지털 신호로 바꾸어 주는 역할을 담당하는 레이어이다.
 
 ### 예제(네이버에서 아이디를 입력하고 로그인 버튼을 클릭했을 때, PC[client]와 SERVER의 데이터 송수신 과정[웹 페이지 전송등])
 
