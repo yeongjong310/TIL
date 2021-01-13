@@ -8,17 +8,17 @@
 LAN은 다들 한번 들어봤을 것이다. 가정에서 보통 KT, LG, SK 등의(ISP)의 인터넷망을 결제해서 사용한다. 
 이 ISP에서는 보통 한 개의 공인 IP를 제공하고 우리가 자주보는 공유기에 연결되어 여러 개의 사설 IP를 생성한다. 
 PC 혹은 디바이스에 연결된 LAN 혹은 WIFI를 통해 생성된 사설 IP가 부여되어 우리는 인터넷을 사용할 수 있는 것이다.
-이 IP와 관련해서 어떠한 구조로 통신하고 있는지 간략하게 정리해 보려고 한다.
+이 IP와 관련해서 어떠한 구조로 데이터를 주고 받는지 간략하게 정리해 보려고 한다.
 
 4 Layer. Application Layer : http, stp, ftp ...
 
-3 Layey. Transport Layer : TCP(데이터를 안전하게 전달하는 방법 정의)
+3 Layey. Transport Layer : TCP(데이터를 안전하고 정확하게 전달하는 방법), UDP(데이터를 빠르게 전달하기 위한 방법) ..
 
-2 Layer. Internet Layer : IP(데이터를 빠르게 전달하는 방법 정의)
+2 Layer. Internet Layer : IP(데이터를 빠르게 전달하는 방법)
 
 1 Layer. Network Access Layer: Ethernet, Wifi, 5G...
 
-## 5계층 => Update된 TCP/IP의 새로운 계층으로 실제로 최근에는 이 모델을 더 많이 따른 다고하여 기술.
+## 5계층 => Update된 TCP/IP의 새로운 계층으로 실제로 최근에는 이 모델을 더 많이 따른 다고한다.
 5. Layer. Application Layer : http, stp, ftp ...
 4. Layer. Transpoprt Layer : TCP
 3. Layer. Network Layer : Ip
@@ -30,28 +30,31 @@ PC 혹은 디바이스에 연결된 LAN 혹은 WIFI를 통해 생성된 사설 I
 Port를 확인해서 정확한 프로세스로 데이터를 전달한다.
 
 #### 4.1. TCP(Transmission Control Protocol): 
-TCP는 신뢰성있는 데이터를 누락없이 해당 프로세스로 보내기 위해 고안된 통신 규약이다.
-왜 이러한 방법이 고안되었을까? 예를들어 발신자가 데이터를 송신하는 중 중 알 수 없는 이유로 그 데이터는 수신자에게 도착하지 않았다.
-데이터 누락이 발생한 것이다. 실제로 라우터가 처리할 수 있는 한계치를 넘어갔을 경우 이러한 일이 발생 할 수 있다. 따라서 이를 해결하기 위해
-TCP는 3-Way Handshake라는 절차를 통해 데이터를 주고 받게된다.
+TCP는 데이터를 안전하고 정확한 해당 프로세스로 보내기 위해 고안된 통신 규약이다.
+왜 이러한 방법이 고안되었을까? 예를들어 발신자가 데이터를 송신하는 중 알 수 없는 이유로 그 데이터는 수신자에게 도착하지 않았다.
+어디선가 데이터 누락이 발생한 것이다. 실제로 라우터가 처리할 수 있는 한계치를 넘어갔을 경우 이러한 일이 발생 할 수 있다. 따라서 이를 해결하기 위해 TCP는 3-Way Handshake라는 절차를 통해 데이터를 주고 받는다.
 ##### 4.1.1 3-Way Handshake
+```
 Client                 Server
      1.------SYN------>
       <----SYN/ACK-----2.
      3.------ACK------>
+```
 ###### 4.1.1.1 flag
-TCP에서 주고 받는 Segment는 TCP header와 Data로 나누어지는데 TCP header에는 송수신자의 PORT 번호와 송수신시 필요한 9가지의 플래그가 있습니다. 9가지 플래그는 각 역할이 정해져있으며 여기서는 SYN, ACK만 다루겠습니다.  
-- SYN(Syncronize): 단어 뜻 그대로 Client와 Server 사이에 연결을 위한 플래그입니다.
-- ACK(Acknowledgement): 정상적으로 데이터를 받았음을 알리기 위한 플래그입니다. 
+TCP에서 주고 받는 Segment는 TCP header와 Data로 나누어지는데 TCP header에는 송수신자의 PORT 번호와 송수신시 필요한 9가지의 플래그가 있다. 9가지 플래그는 각 역할이 정해져있으며 여기서는 SYN, ACK만 기술할 것이다.  
+- SYN(Syncronize): Client와 Server 사이에 연결을 위한 플래그.
+- ACK(Acknowledgement): 정상적으로 데이터를 받았음을 알리기 위한 플래그. 
 ##### 4.1.2 연결 과정
-- 1. 위의 그림을 보면 Client가 SYN을 SERVER로 넘겨주게 되는데 Server는 이 SYN에 해당하는 데이터가 1인지 확인하여 Client가 연결을 원하는지 알아차립니다.
-- 2. 위의 그림을 보면 Server는 SYN/ACK을 보내게 되는데, 그 이유는 SERVER도 SYN을 1로 설정한 TCP Header를 Client로 보내서 Server 또한 통신하고 싶다는 메세지를 보내고 이와 함께 ACK을 보내서 이전에 Client가 SERVER와 통신하고 싶다고 보낸 메세지(데이터) 또한 잘 받았다고 알리게 되는 것 입니다.  
-- 3. 위의 그림을 보면 다시 CLinet가 Server에게 ACK을 보냅니다. Client가 Server의 SYN/ACK을 잘 받았다고 알리기 위해서입니다.
+- 1. 위의 그림을 보면 Client가 SYN을 SERVER로 넘겨주게 되는데 Server는 이 SYN에 해당하는 데이터가 1인지 확인하여 Client가 연결을 원하는지 알아차린다.
+- 2. 그 다음으로 Server는 Client로 SYN/ACK을 보내게 된다. 그 이유는 ACK은 SERVER가 우선 Client로 부터 데이터(연결요망)를 잘 받았다고 알리기 위함이고 SYN은 SERVER도 SYN을 1로 설정한 TCP Header를 Client로 보내는 과정을 통해 Server 또한 통신하고 싶다는 메세지를 Client에게 확인시키기 위함이다.
+- 3. 위의 그림을 보면 다시 Clinet가 Server에게 ACK을 보냅니다. Client가 Server의 SYN/ACK을 잘 받았다고 알리기 위해서입니다.
 이 3가지 단계를 거치면 Client와 Server 사이에 연결이 수립되고, 그 이후로는 아래와 같이 Segment를 보내고 ACK을 보내기를 반복합니다.
-Client                 Server
-     1.----Segment---->
-      <------ACK------2.
-     3.----Segment---->
+```
+Client                 Server  
+     1.----Segment---->  
+      <------ACK------2.  
+     3.----Segment---->  
+```
 ##### 4.1.3 TCP의 장점 정리
 1. 신뢰성 및 흐름제어(Flow Control)
 2. 혼잡제어(Congestion Control)
