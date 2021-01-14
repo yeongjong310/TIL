@@ -79,7 +79,7 @@ UDP는 짧은 레이턴시를 우선적으로 생각하는 방법이다. 즉 빠
 #### 용어정리
 ##### 데이터 단위(PDU[Protocol Data Unit])
 - data: 5 Layer Apllication Layer 에서 http 프로토콜에 의해 http 헤더와 바디 형태로 데이터가 만들어진다. 헤더에는 GET/POST 메소드와 URL 등의 메타정보가 담겨 있다.
-- segment: 4 Layer Transport Layer 에서 TCP 프로토콜에 의해 4Layer에서 만들어진 데이터 앞에 TCP 헤더가 붙는다. TCP 헤더에는 클라이언트와 서버의 port 넘버가 담겨있다. 이렇게 만들어진 데이터를 "Segment" 라고 한다.
+- segment: 4 Layer Transport Layer 에서 TCP 프로토콜에 의해 4Layer에서 만들어진 데이터 앞에 TCP 헤더가 붙는다. TCP 헤더에는 클라이언트와 서버의 port 넘버가 담겨있다. 이렇게 만들어진 데이터를 "Segment" 라고 한다. Segment라고 불리는 이유는 한번에 전송할 수 있는 데이터의 양이 정해져있는데 이를 MTU(Maximum Transfer Unit)이라고 한다. TCP의 경우 Segment화 과정에서 큰 데이터가 MTU보다 작은 데이터로 분할되며, 각 데이터에 순서를 지정해 수신자가 데이터를 받으면 하나의 원본 데이터로 조합할 수 있도록 한다.
 - Packet: 3 Layer Internet Layer 에서 IP 프로토콜에 의해 Segment 앞에 IP 헤더가 붙는다. IP 헤더에는 클라이언트와 서버의 IP 주소가 담겨있다.
 이렇게 만들어진 데이터를 "Packet"이라고 한다.
 - Frame: 1,2 Layer(Network Access Layer) 에서 Segment 앞에 클라이언트와 서버의 MAC주소(Ethernet 헤더)가 붙고, 이렇게 만들어진 데이터를 "Frame"이라고 한다.
