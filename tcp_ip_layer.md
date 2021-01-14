@@ -107,7 +107,9 @@ Frame에 담긴 LAN카드의 mac address 를 확인하여 Server로 진입한다
 
 
 ### 다음에 공부할 자료:
-Response Header, Request Header, 
+[HTTP Messages](https://developer.mozilla.org/en-US/docs/Web/HTTP/Messages)
+[Response Header](https://developer.mozilla.org/en-US/docs/Glossary/Request_header#:~:text=A%20request%20header%20is%20an,preferred%20formats%20of%20the%20response.)
+[Request Header](https://developer.mozilla.org/en-US/docs/Glossary/Response_header)
 ## 참고자료
 [TCP/IP 원리](https://www.youtube.com/watch?v=W9uosPORF8Y&t=479s)
 
