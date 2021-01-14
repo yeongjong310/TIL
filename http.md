@@ -50,7 +50,8 @@ HTTP가 처음으로 상용화된 1.0 버전에는 생각보다 불편한 것들
 ### 2.1.3. [Chunked Response&#91;2&#93;](#참고)
 Request에 대한 처리가 완전히 끝나기 전까지 사용자에게 얼마나 큰 데이터를 응답할지 알 수 없는 경우기 있다. 큰 이미지를 보내는 경우나
 큰 데이터 양을 테이블로 만들 때 사용한다.
-그 외에도 헤더에 호스트가 추가되는 등이있다.
+
+그 외에도 헤더에 호스트가 추가되는 등이 꽤 많은 것이 바뀌었다.
 
 ### 2.2.4. 문제점
 #### 2.2.4.1. Head Of Line Blocking
@@ -77,3 +78,4 @@ Header내의 중복된 데이터를 재사용하여 새로운 데이터와 함�
 - &#91;1&#93; [If-Modified-Since](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-Modified-Since)
 - &#91;2&#93; [Chenked Response](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Transfer-Encoding)
 - &#91;3&#93; [HTTP2](https://developers.google.com/web/fundamentals/performance/http2)
+- [Evolution HTTP](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Evolution_of_HTTP)
