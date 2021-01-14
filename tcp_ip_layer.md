@@ -78,28 +78,30 @@ UDP는 짧은 레이턴시를 우선적으로 생각하는 방법이다. 즉 빠
 
 #### 용어정리
 ##### 데이터 단위(PDU[Protocol Data Unit])
-- data: 4 Layer Apllication Layer 에서 http 프로토콜에 의해 http 헤더와 바디 형태로 데이터가 만들어진다. 헤더에는 GET/POST 메소드와 URL 등의 메타정보가 담겨 있다.
-- segment: 3 Layer Transport Layer 에서 TCP 프로토콜에 의해 4Layer에서 만들어진 데이터 앞에 TCP 헤더가 붙는다. TCP 헤더에는 클라이언트와 서버의
-port 넘버가 담겨있다. 이렇게 만들어진 데이터를 "Segment" 라고 한다.
-- Packet: 2 Layer Internet Layer 에서 IP 프로토콜에 의해 Segment 앞에 IP 헤더가 붙는다. IP 헤더에는 클라이언트와 서버의 IP 주소가 담겨있다.
+- data: 5 Layer Apllication Layer 에서 http 프로토콜에 의해 http 헤더와 바디 형태로 데이터가 만들어진다. 헤더에는 GET/POST 메소드와 URL 등의 메타정보가 담겨 있다.
+- segment: 4 Layer Transport Layer 에서 TCP 프로토콜에 의해 4Layer에서 만들어진 데이터 앞에 TCP 헤더가 붙는다. TCP 헤더에는 클라이언트와 서버의 port 넘버가 담겨있다. 이렇게 만들어진 데이터를 "Segment" 라고 한다.
+- Packet: 3 Layer Internet Layer 에서 IP 프로토콜에 의해 Segment 앞에 IP 헤더가 붙는다. IP 헤더에는 클라이언트와 서버의 IP 주소가 담겨있다.
 이렇게 만들어진 데이터를 "Packet"이라고 한다.
-- Frame: 1 Layer Network Access Layer 에서 Segment 앞에 클라이언트와 서버의 MAC주소(Ethernet 헤더)가 붙고, 이렇게 만들어진 데이터를 "Frame"이라고 한다.
+- Frame: 1,2 Layer(Network Access Layer) 에서 Segment 앞에 클라이언트와 서버의 MAC주소(Ethernet 헤더)가 붙고, 이렇게 만들어진 데이터를 "Frame"이라고 한다.
 
 ##### 네트워크 용어
 - WAN: 국가 이상의 넓은 지역을 지원하는 네트워크 구조. 둘 이상의 LAN이 넓은 지역에 걸쳐 연결되어 있는 네트워크를 말한다.
 - LAN: 비교적으로 가까운 거리에 위치한 소수의 장치들을 서로 연결한 네트워크로, 일반적으로 하나의 사무실 또는 몇 개의 건물을 연결한 네트워크를 말한다. 
 - 라우터: LAN과 LAN , WAN과 WAN, WAN과 LAN을 연결해주는 장치이면서 데이터가 이 LAN과 WAN을 통해 최적의 경로를 설정하고 목적지에 도달하게 도와주는 장치.
 - MAC address: 하드웨어가 가지고있는 물리적인 주소.
-#### 데이터 전송 과정
-1. 네트워크 카드에 연결된 LAN선을 통해 Frame은 종단 라우터(edge router: 라우터의 가장자리)로 이동한다.(공유기 등의 과정은 생략)
-2. 종단 라우터는 Frame의 가장 앞단인 Ethernet 헤더를 벗겨 Packet 데이터로 만들고, Packet의 Ip 헤더 부분에 담겨있는 서버(송신자)의 Ip 주소를 확인한다.
-Ip 주소를 통해 가장 최적의 경로를 확인하고 그 방향에 위치한 코어 라우터(core router: 라우터의 핵심-고성능,신뢰성 요구)로 Frame을 전송한다.
-3. 이렇게 라우터를 타고가다 서버에 연결된 종단 라우터(최종 라우터)에 도착하면 이 라우터는 2번과 같은 과정을 통해 IP를 확인한 후,
-목적지인 Server의 mac address 를 확인하여 해당 Server로 진입한다. 
-4. Server에서는 Segment의 TCP헤더에 저장된 Port 번호를 확인하여 이 데이터가 80번 포트라면 http 요청이라는 것을 확인한다.
-5. 80번 포트를 사용하고있는 프로세스(웹 프레임워크)에서 data를 확인하고 메타데이터에서는 어떤 메소드와 어떤 주소로 데이터를 요청했는지 
-확인하고 이에 맞는 코드를 실행한다.
-6. 실행된 결과(데이터)를 다시 Frame화 한 후 앞 과정을 거처 Client에게 응답한다.
+#### 데이터 전송 과정(TCP)
+0. server와 client의 연결 수립
+1. Client에서 로그인 DATA를 입력하고 로그인 버튼을 누르면 5Layer에서는 HTTP header(POST, HOST....) + DATA 형태로 다음 레이어로 갈 준비를 마친다.
+2. 4Layer에서는 Port번호와 함께 랜덤의 SYN 넘버를 생성하여 TCP header에 저장하고 그 TCP header + DATA 형태로 Segment를 만든다.
+3. 3Layer에서는 Ip header(송수신자의 ip주소) + Segment 형태로 Packet을 만든다.
+4. 2Layer와 1Layer를 거쳐 Ethernet header(Mac 주소) + Packet 형태로 Frame을 만들고 Frame은 아날로그 신호로 변경된다.
+5. 네트워크 카드에 연결된 LAN선을 통해 Frame은 종단 라우터(edge router: 라우터의 가장자리)로 이동한다.(공유기 등의 과정은 생략)
+6. 종단 라우터는 Frame의 가장 앞 단인 Ethernet 헤더를 벗겨 Packet 데이터로 만들고, Packet의 Ip 헤더 부분에 담겨있는 서버(송신자)의 Ip 주소를 확인한다. Ip 주소를 통해 가장 최적의 경로를 확인하고 그 방향에 위치한 코어 라우터(core router: 라우터의 핵심-고성능,신뢰성 요구)로 Frame을 전송한다.
+7. 이렇게 라우터를 타고가다 서버에 연결된 종단 라우터(최종 라우터)에 도착하면 이 라우터는 2번과 같은 과정을 통해 IP를 확인한 후,
+Frame에 담긴 LAN카드의 mac address 를 확인하여 Server로 진입한다. 
+8. Server에서는 Segment의 TCP헤더에 저장된 Port 번호를 확인하여 이 데이터가 80번 포트라면 http 요청이라는 것을 확인한다.
+9. 80번 포트를 사용하고있는 프로세스(웹 프레임워크)에서 data를 확인하고 header에 저장된 메타데이터에서는 어떤 메소드와 어떤 주소로 데이터를 요청했는지 확인하여 이에 맞는 코드를 실행한다.
+10. 실행된 결과(데이터)를 다시 Frame화 한 후 앞 과정을 거처 Client에게 응답한다.
 
 
 ## 참고자료
