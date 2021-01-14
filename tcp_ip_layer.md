@@ -1,7 +1,6 @@
 # TCP / IP 4 layer
 네이버 FE 채용공고의 한 작성 문항에서 글로벌 서비스를 개발할 때 어떤 점을 중요하다고 생각하는지 기술하는 란이 있었다.
-그 동안 글로벌한 서비스에 대해 따로 깊이 있게 생각해 보지 않았는데, 이번 기회에 글로벌 서비스를 위한 기술로 어떤 것들이 쓰이는지 찾아보며
-알게된 개념중 하나인 RTT(Round Trip Time)를 개선하는 중요한 방법인 HTTP/2 를 접하게 되었다. 여기서는 HTTP/2를 알아보기 전
+그 동안 글로벌한 서비스에 대해 따로 깊이 있게 생각해 보지 않았는데, 이번 기회에 글로벌 서비스를 위한 기술로 어떤 것들이 쓰이는지 찾아보려한다. HTTP/2는 기존 HTTP/1.1의 단점을 보완한 것으로 글로벌 네트워크에서 RTT(Round Trip Time)를 개선하는 할 수 있는 새로운 방법 글로벌 네트워크에서  개선하는 중요한 방법  를 접하게 되었다. 여기서는 HTTP/2를 알아보기 전
 밑바탕이되는 TCP/IP 개념을 다시 한번 집고 넘어가려고 한다.
 
 ## 4계층
@@ -19,20 +18,22 @@ PC 혹은 디바이스에 연결된 LAN 혹은 WIFI를 통해 생성된 사설 I
 1 Layer. Network Access Layer: Ethernet, Wifi, 5G...
 
 ## 5계층 => Update된 TCP/IP의 새로운 계층으로 실제로 최근에는 이 모델을 더 많이 따른 다고한다.
-5. Layer. Application Layer : http, stp, ftp ...
-4. Layer. Transpoprt Layer : TCP
-3. Layer. Network Layer : Ip
-2. Layer. DataLink Layer: 같은 네트워크에 속한 여러 대의 컴퓨터(스위치로 연결된 컴퓨터들)들이 데이터를 주고 받기 위해 필요한 레이어이다.
-1. Layer. Physical Layer: 전선은 아날로그 신호밖에 전송하지 못한다. 디지털신호를 만들어내는 컴퓨터를 아날로그 신호로 바꾸어 전송하고 
+5 Layer. Application Layer : http, stp, ftp ...
+4 Layer. Transpoprt Layer : TCP
+3 Layer. Network Layer : Ip
+2 Layer. DataLink Layer: 여러대의 컴퓨터가 연결된 네트워크 속 데이터의 송수신은 동시 다발적으로 일어난다. 데이터 링크 레이어는 한 컴퓨터가 받고있는 데이터들을 구분하여 데이터의 시작과 끝을 파악한다.
+1 Layer. Physical Layer: 전선은 아날로그 신호 밖에 전송하지 못한다. 디지털신호를 만들어내는 컴퓨터를 아날로그 신호로 바꾸어 전송하고 
 전달받은 아날로그 신호는 디지털 신호로 바꾸어 주는 역할을 담당하는 레이어이다.
 
-### 4. Transport Layer:
-Port를 확인해서 정확한 프로세스로 데이터를 전달한다.
+### 4 Transport Layer:
+Transport Layer는 계층의 이름과 같이 데이터를 수송하는 방과 직접적으로 연관된 계층이다. 
+프로세스가 점유하고 있는 Port넘버를 확인하여 정확한 프로세스로 데이터를 전달하는데 중점을 두고있다.
+대표적으로 이 계층에서 사용되는 프로토콜은 TCP와 UDP이다. 
 
 #### 4.1. TCP(Transmission Control Protocol): 
-TCP는 데이터를 안전하고 정확한 해당 프로세스로 보내기 위해 고안된 통신 규약이다.
+TCP는 데이터를 **안전하고** 해당 프로세스로 보내기 위해 고안된 통신 규약이다.
 왜 이러한 방법이 고안되었을까? 예를들어 발신자가 데이터를 송신하는 중 알 수 없는 이유로 그 데이터는 수신자에게 도착하지 않았다.
-어디선가 데이터 누락이 발생한 것이다. 실제로 라우터가 처리할 수 있는 한계치를 넘어갔을 경우 이러한 일이 발생 할 수 있다. 따라서 이를 해결하기 위해 TCP는 3-Way Handshake라는 절차를 통해 데이터를 주고 받는다.
+어디선가 데이터 누락이 발생한 것이다. 실제로 라우터가 처리할 수 있는 한계치를 넘어갔을 경우 이러한 일이 발생 할 수 있다. 이와 같이 데이터 누락 혹은 훼손된 데이터가 전송되는 것을 방지하기 위해 TCP는 3-Way Handshake라는 절차를 통해 데이터를 주고 받는다.
 ##### 4.1.1 3-Way Handshake
 ```
 Client                 Server
@@ -41,14 +42,14 @@ Client                 Server
      3.------ACK------>
 ```
 ###### 4.1.1.1 flag
-TCP에서 주고 받는 Segment는 TCP header와 Data로 나누어지는데 TCP header에는 송수신자의 PORT 번호와 송수신시 필요한 9가지의 플래그가 있다. 9가지 플래그는 각 역할이 정해져있으며 여기서는 SYN, ACK만 기술할 것이다.  
-- SYN(Syncronize): Client와 Server 사이에 연결을 위한 플래그.
-- ACK(Acknowledgement): 정상적으로 데이터를 받았음을 알리기 위한 플래그. 
+TCP에서 주고 받는 Segment는 TCP header와 Data로 나누어지는데 TCP header에는 송수신자의 PORT 번호와 송수신시 필요한 9가지의 플래그가 있다. 9가지 플래그는 각 역할이 정해저 있으며 여기서는 SYN, ACK만 기술할 것이다.  
+- SYN(Syncronize): Client와 Server 사이에 연결을 원하는지 확인하기 위한 플래그.
+- ACK(Acknowledgement): 정상적으로 데이터(신호)를 받았음을 알리기 위한 플래그. 
 ##### 4.1.2 연결 과정
 - 1. 위의 그림을 보면 Client가 SYN을 SERVER로 넘겨주게 되는데 Server는 이 SYN에 해당하는 데이터가 1인지 확인하여 Client가 연결을 원하는지 알아차린다.
-- 2. 그 다음으로 Server는 Client로 SYN/ACK을 보내게 된다. 그 이유는 ACK은 SERVER가 우선 Client로 부터 데이터(연결요망)를 잘 받았다고 알리기 위함이고 SYN은 SERVER도 SYN을 1로 설정한 TCP Header를 Client로 보내는 과정을 통해 Server 또한 통신하고 싶다는 메세지를 Client에게 확인시키기 위함이다.
-- 3. 위의 그림을 보면 다시 Clinet가 Server에게 ACK을 보냅니다. Client가 Server의 SYN/ACK을 잘 받았다고 알리기 위해서입니다.
-이 3가지 단계를 거치면 Client와 Server 사이에 연결이 수립되고, 그 이후로는 아래와 같이 Segment를 보내고 ACK을 보내기를 반복합니다.
+- 2. 그 다음으로 Server는 Client로 SYN/ACK을 보내게 된다. 그 이유는 ACK은 SERVER가 우선 Client로 부터 데이터(연결요망)를 잘 받았다고 알리기 위함이고 SYN은 SERVER도 SYN을 1로 설정한 TCP Header를 Client로 보냄으로써 Server 또한 통신하고 싶다는 메세지를 Client에게 확인시키기 위함이다.
+- 3. 위의 그림을 보면 다시 Clinet가 Server에게 ACK을 보낸다. Client가 Server의 SYN/ACK을 잘 받았다고 알리기 위해서이다.
+이 3가지 단계를 거치면 Client와 Server 사이에 연결이 수립되고, 그 이후로는 아래와 같이 Segment를 보내고 ACK을 보내기를 반복한다.
 ```
 Client                 Server  
      1.----Segment---->  
@@ -60,7 +61,7 @@ Client                 Server
 2. 혼잡제어(Congestion Control)
 ##### 4.1.3 TCP의 문제점
 TCP는 데이터의 신뢰성을 보장하지만 수신속도가 떨어지는 단점이 있고, 경우에 따라 조금 손상된 데이터가 전송되어도 상관없는 동영상 스트리밍같은
-데이터 송수신 과정에서는 TCP를 이용하면 조금 비효율적일 수 있습니다. 그래서 그 대안으로 UDP를 사용한다.
+데이터 송수신 과정에서는 TCP를 이용하면 비효율적일 수 있다. 그래서 그 대안으로 UDP를 사용한다.
 
 #### 4.2. UDP
 
