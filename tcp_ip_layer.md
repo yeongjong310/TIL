@@ -106,6 +106,8 @@ Frame에 담긴 LAN카드의 mac address 를 확인하여 Server로 진입한다
 12. 이번에는 해당 포트를 사용하고 있는 프로세스가 브라우저이다. 브라우저에서 header에 저장된 데이터를 토대로 data를 해석해서 사용자에게 화면을 보여준다.
 
 
+### 다음에 공부할 자료:
+Response Header, Request Header, 
 ## 참고자료
 [TCP/IP 원리](https://www.youtube.com/watch?v=W9uosPORF8Y&t=479s)
 
