@@ -54,8 +54,8 @@ a === 2 // false;
 
 왜 false 일까? 이유는 사용자에게 입력받은 값 2는 문자 타입으로 변수 a에 저장됐고, 비교하고자 하는 2는 숫자 2이기 때문이다.
 이 처럼 내가 생각한 2와 누군가가 생각한 2는 다를 수 있고 결국 코드의 의도와는 다른 방향으로 흘러갈 것이다. 그래서 이 같은 상황들을 구분하기 위해 타입이 존재한다.
-### 4.1. Primative value
-자바스크립트에서는 값이 정의 될 수 있는 가장 최소한의 형태를 5가지의 타입으로 나눴다. 그리고 그 5가지 타입에 속하는 값들을 Primative value(원시값)이라고 정의했다. 아래가 그 원시값의 예시이다.
+### 4.1. Primitive value
+자바스크립트에서는 값이 정의 될 수 있는 가장 최소한의 형태를 5가지의 타입으로 나눴다. 그리고 그 5가지 타입에 속하는 값들을 Primitive value(원시값)이라고 정의했다. 아래가 그 원시값의 예시이다.
 ```
 "I am a string"; // 문자열(String)
 42; // 숫자(Number)
@@ -63,7 +63,7 @@ true; // 불린(Boolean)
 null; // null; 빈 값
 undefined; // 정의되지 않은 값
 ```
-#### 4.1.1. Primative value 의 특징
+#### 4.1.1. Primitive value 의 특징
 - 값을 복사한다.
 ```
 var num1 = 1;
@@ -74,10 +74,13 @@ var num1 = null;
 console.log(num1, num2); // null 1
 ```
 num2에 num1를 저장하고 num1을 null로 초기화했다. 그리고 num2를 출력해보면 num1에 저장된 null과는 다른 1이 출력된다.
-이게 왜? 뭐가 어때서 라고 생각할 수 있으니 Primative value와 비교되는 Reference value를 보고오자.
+이게 왜? 뭐가 어때서 라고 생각할 수 있으니 Primitive value와 비교되는 Reference value를 보고오자.
 
 ### 4.2. reference value
-참조 값이라고하며  https://webclub.tistory.com/240
+참조 값이라고하며 Ojbect, Array 즉 
+```
+```
+https://webclub.tistory.com/240
 
 
 
