@@ -67,21 +67,54 @@ undefined; // 정의되지 않은 값
 - 값을 복사한다.
 ```
 var num1 = 1;
-var num2 = num1;
+var num2 = 1;
 
-var num1 = null;
-
-console.log(num1, num2); // null 1
+console.log(num1 === num2); // true
 ```
-num2에 num1를 저장하고 num1을 null로 초기화했다. 그리고 num2를 출력해보면 num1에 저장된 null과는 다른 1이 출력된다.
+num1과 num2에 각각 1을 저장했다 그리고 num1과 num2가 같은지 확인하니 true가 출력된다.
 이게 왜? 뭐가 어때서 라고 생각할 수 있으니 Primitive value와 비교되는 Reference value를 보고오자.
 
-### 4.2. reference value
-참조 값이라고하며 Ojbect, Array 즉 
+### 4.2. Reference value
+참조 값이라고하며 Ojbect, Array, Function, RegExg가 이에 해당한다. 참조 값은 주소를 복사한다.
 ```
+var obj1 = new Object({a:1});
+var obj2 = new Object({a:1});
+console.log(obj1 === obj2) // false
 ```
-https://webclub.tistory.com/240
+obj1과 obj2는 모두 `{a:1}` 로 같은 값이다. 하지만 obj1과 obj2이 이 값을 가져오는 방식이 조금 특이하다. {a:1}은 두 개의 다른 메모리 주소에 저장됐고, obj1과 obj2는 이 주소를 참조해서 값을 가지고 오는 것이다. 따라서 `obj1 === obj2`는 다른 주소를 비교하기 때문에 `false`라는 결과를 출력한다.
+```
+var obj1 = new Object({a:1});
+var obj2 = obj1;
+obj1['num'] = 1;
+console.log(obj1 === obj2); // true
+```
+그래서 위와 같이 obj2에 obj1을 할당하고 obj1 객체를 수정해도 각 변수가 가리키는 주소가 동일하기 때문에 `obj1 === obj2` 역시 `true` 인 것이다. 
 
 
+다시 돌아와서 Primitive value는 Reference value와 달리 값 자체를 저장하고 복사한다. 따라서 순수한 값의 비교를 할 수 있다. 
+```
+var num1 = 1;
+var num2 = num1;
+var num1 = 2;
+console.log(num1 === num2); // false;
+```
+### 4.3 Converting Betwwen Types
+```
+var a = "42";
+var b = Number( a );
+console.log( a );         // "42"
+console.log( b );         // 42
+consonle.log ( a == b );  // true
+```
+`Number(..)`는 explicit coercion 이다. 다른 타입에서 `number` 타입으로 의도적으로 타입을 바꾼다.
 
+#### 4.3.1. implicit coercion
+위 예제와 같이 `a == b`가 실행되면 javascript는 `string` `"42"`를 `number` `42`로 암묵적으로 바꾸고 비교해서 `true`를 출력한다. 
+이와 같은 Javascript가 암묵적으로 타입을 바꾸는 행위를 implicit coercion이라고 한다.
 
+## 5. Variables
+타 언어들과 달리 Javascript는 특정 타입을 선언하는 키워드가 없다. `var` 키워드를 사용해서 모든 타입의 변수를 선언하기 때문에 때로는 
+이 유연성이 독이 될 수 있다. [4.value의 예시](#참고) 처럼 말이다.
+
+##### 참고:
+- [자바스크립트 기본타입(원시값=단순값)](https://webclub.tistory.com/240)
