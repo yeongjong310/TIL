@@ -45,7 +45,7 @@ alert( a );
 - Comparison: `<`, `>`, `<=`, `>=`
 - Logical: `&&`(and), `||`(or)
 
-## 4. Values & Types
+## 4. values & types
 ```
 a = prompt() // 사용자에게 2라는 입력값을 받음
 a === 2 // false;
@@ -114,7 +114,7 @@ consonle.log ( a == b );  // true
 
 ## 5. Variables
 타 언어들과 달리 Javascript는 특정 타입을 선언하는 키워드가 없다. `var` 키워드를 사용해서 모든 타입의 변수를 선언하기 때문에 때로는 
-이 유연성이 독이 될 수 있다. [4.value의 예시](#4.-Values-&-Types) 처럼 말이다.
+이 유연성이 독이 될 수 있다. [4.value의 예시](#4.-values-&-types) 처럼 말이다.
 
 ##### 참고:
 - [자바스크립트 기본타입(원시값=단순값)](https://webclub.tistory.com/240)
