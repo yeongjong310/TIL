@@ -233,7 +233,7 @@ function foo() {
 ```
 
 ## 4. Functions As Values
-함수는 실질적으로는 변수이다. 변수에 값으로 저장될 수 있고, 함수에서 값으로 리턴되기도 하며, 함수의 파라미터로 입력되기도 한다.
+함수는 실질적으로 변수이다. 함수를 변수의 값으로 저장할 수도 있고, 함수 내에서 값으로 리턴되기도 하며, 함수의 파라미터로 입력되기도 한다.
 ```
 var foo = function() {      // anonymous 익명인 함수가 변수 foo에 저장됨
 	// ..
@@ -245,9 +245,82 @@ var x = function bar(){     // named 이름 bar로 생성된 함수가 x 변수�
 ```
 이 둘의 차이는 see the Scope & Closures에서 더 깊게 공부한다.
 ### 4.1. Immediately Invoked Function Expressions (IIFEs)
+함수를 선언과 동시에 즉시 호출하는 방법도 있다.
+```
+(function IIFFE(){
+	console.log( "Hello" );
+})();
+// "Hello"
+```
+`()` 함수를 감싸는 소괄호는 함수는 IIFE가 일반 함수처럼 전역에 등록되는 것을 방지한다.
+그리고 마지막에 사용된 `()` 소괄호가 그 함수를 실행한다.
+IIFE의 장점은 함수를 즉시호출함과 동시에 그 함수가 전역에 등록되지 않기 때문에 한번 쓰고 버릴 수 있는 일회용 함수를 만들 때 꽤나 유용하게 쓰일 듯 하다.
+```
+var x = (function IIFFE(){
+	return 10
+})();
+x; // 10
+```
+함수가 실행되고 반환한 10을 외부변수에 담을 수 도 있다.
+
+```
+(x = function IIFFE(){
+	console.log( "Hello" );
+})();
+```
+다음과 같이 함수를 변수 x에 할당하면 전역변수 x에 할당되어 지속적으로 사용할 수 있다. 하지만 예상대로 `let, var, const` 같은 키워드는 사용할 수 없는 것으로 보아 x가 전역으로 저장되는 이 방식은 의도된 문법은 아닌듯 하다. 또한 아무리 생각해봐도 쓸모 없다...
 
 ### 4.2. Closure
+클로져는 함수가 결과를 반환하고 끝이난 이후에도 다시 그 함수 스코프에 접근하기 위한 방법이다.
+```
+function makeAdder(x) {
+	function add(y) {
+		return y + x;
+	};
+	return add;
+}
 
+var plusOne = makeAdder( 1 );
+var plusTen = makeAdder( 10 );
+
+plusOne( 3 );	// 4 	<-- 1+ 3
+plusOne( 41 );	// 42 	<-- 1 + 41
+
+plusTen( 13 );	// 23 	<-- 10 + 13
+```
+makeAdder 함수는 이미 add 함수를 반환했다. 반환 즉시 이 함수는 끝이났기 때문에 이후에 plusOne( 3 )을 호출하면
+```
+add(3) {
+	return 3 + x;
+}
+```
+위 코드가 실행되고 x를 이미 종료된 makeAdder 함수로부터 불러와야 하므로 오류가 날것이라 생각할지 모른다.
+하지만 우리가 공부하는 `closure`는 외부 함수(makeAdder)가 이미 종료되었을 지라도 그 함수 스코프 내의 변수(x)를 기억하고 있다가 
+반환된 내부함수(add)에서 변수(x)에 접근할 수 있게 해준다
+그래서 위와 같이 `plusone( 3 )`은 4를 `plusTen( 13 )`은 23을 반환하는 것이다.
+
+### 4.3 Modules
+Closure는 모듈화에 자주 사용되는 방식이다.
+```
+function User(){
+	var username, password;
+	
+	fucntion doLogin(user,pw) {
+		username = user;
+		password = pw;
+	}
+	
+	var publickAPI = {
+		login: doLogin
+	};
+	
+	return publickAPI;
+}
+var fred = User();
+fred.login( "fred", "12Battery34!" );
+```
+이 함수는 publickAPI라는 객체를 반환한다. 그리고 그 객체는 login 기능을 제공하는데 이 login은 doLogin 함수를 실행시키고 내부 변수 username과 password에 사용자로 부터 입력받은 값을 저장한다. doLogin과 username, password는 User 모듈을 통해서만 접근이 가능하다.
+이 처럼 외부에 노출시키지 않고 변수와 함수를 이 모듈을 통해서만 접근이 가능하도록 코드를 작성하는 것은 사용하기에 따라 매우 큰 유용하게 쓰일 수 있다.
 ## 6. This Identifier
 
 ## 7. Prototypes
