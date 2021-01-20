@@ -161,7 +161,7 @@ if (amount > 10) {                // <-- block attached to `if`
 ## 7. Conditional
 조건문은 `if (...) {statements}` 형태로 작성된다.
 소괄호 안의 값이 참이면 해당하는 Block안의 명령문들이 실행되는 구조이다. 
-한가지 눈여겨 볼 것은 javascript가 false로 implicit coercion 하는 list가 있는데 `undefined`, `null`, `""`, `0` 등이 있고 이 값이 (...)안에 들어오면 false이기 때문에 실행되지 않는다. 반대로 true로 implicit coercion하는 list가 있는데 false list에 속하지 않은 실존하는 값은 true로 변화한다. `99.99`, `free` 같은 값이 이에 해당한다. 하
+한가지 눈여겨 볼 것은 javascript가 false로 implicit coercion 하는 list가 있는데 `undefined`, `null`, `""`, `0`, `-0`, `NaN`들이 이 list에 속한다. 이 값이 (...)안에 들어오면 false이기 때문에 실행되지 않는다. 반대로 true로 implicit coercion하는 list가 있는데 false list에 속하지 않은 실존하는 값은 true로 변화한다. `99.99`, `free`, `[]`, `{}`, `function foo() { .. }` 같은 값이 이에 해당한다.
 ## 8. Loops
 ### 8.1. while
 `while(조건식){statements}` 형태로 작성된다.
