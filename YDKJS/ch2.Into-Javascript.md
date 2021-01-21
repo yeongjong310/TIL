@@ -322,13 +322,82 @@ fred.login( "fred", "12Battery34!" );
 이 함수는 publickAPI라는 객체를 반환한다. 그리고 그 객체는 login 기능을 제공하는데 이 login은 doLogin 함수를 실행시키고 내부 변수 username과 password에 사용자로 부터 입력받은 값을 저장한다. doLogin과 username, password는 User 모듈을 통해서만 접근이 가능하다.
 이 처럼 외부에 노출시키지 않고 변수와 함수를 이 모듈을 통해서만 접근이 가능하도록 코드를 작성하는 것은 사용하기에 따라 매우 큰 유용하게 쓰일 수 있다.
 ## 6. This Identifier
+타언어와 달리 Js의 this는 마냥 자신을 가리키는게 아니다.
+함수가 어디서 불려졌는지에 따라 this가 가리키는 객체가 바뀐다.
+```
+function foo() {
+	console.log( this.bar );
+}
+
+var bar = "global";
+
+var obj1 = {
+	bar: "obj1",
+	foo: foo
+}
+
+var obj2 = {
+	bar: "obj2"
+}
+
+foo();			// "global" => 함수내에 this로 정의한 프로퍼티가 없다면, this는 전역을 바라본다. 엄격모드에서는 X
+obj1.foo();		// "obj1" => obj1의 메소드로 실행될 경우 실행된 메소드 foo안에서의 this는 객체를 바라본다.
+foo.call( obj2 );	// "obj2" => call의 인자로받은 obj2가 foo의 this가 된다.
+new foo();		// "undefined" 함수로 생성된 객체는 this가 자신을 바라본다.
+```
 
 ## 7. Prototypes
+객체끼리 상속하기 위한 방법.
+```
+var foo = {
+	a:42
+};
+
+var bar = Object.create( foo );
+
+bar.b = "hello world";
+
+bar.b; // "hello world";
+bar.a; // 42 <-- delegated to `foo`
+```
 
 ## 8. Old & new
-
+Js는 최글들어 많은 변화가 있었다. 특히 문법적으로 많이 바뀌었는데, 브라우저마다 고유의 Js 인터프리터를 사용하므로 새로운 문법을 어떤 브라우저에서는 이 문법으로 짠 코드가 잘 실행되는 반면, 어떤 브라우저에서는 아닌 경우가 있다. 이런 문제를 해결하기 위한 두 가지 방법이 존재한다.
 ## 8.1. PolyFilling
+PloyFilling은 신버전 문법을 사용할 수 없는 겨우 구버전 문법으로 이 문법을 대체하는 작업을 의미한다.
+예를들어 Es6 버전부터 지원하는 Number.isNan(x) 메소드는 x의 타입이 Number이지만 값은 Number가 아닐 때 `true`를 반환한다.
+```
+Number.isNaN(0/0); // true
+Number.isNaN("asd"); // false 문자는 type이 number아니기 때문에 false
+```
+이때 구버전에서는 Numer.isNaN을 지원하지 않기 때문에 다음과 같이 if문을 사용해서 Number.isNaN을 지원하지 않는 브라우저는 구버전 코드가 실행되도록 할 수 있다. 이런 과정을 Polyfilling이라고 한다.
+```
+if (!Number.isNaN) {
+	Number.isNaN = function isNaN(x) {
+		return x !== x;			// NaN은 자신을 비교했을 때 false를 반환하는 유일한 값이다. 
+	};
+}
+```
+위 코드는 매우 단순하지만 조금 더 복잡한 기능을 구현할 때는 작성한 코드에 오류가 없을지 매우 신중하게 검토해 봐야한다. 또한 이미 다른 개발자들이 구버전의 코드로 작성해둔 코드가 있기 때문에 이를 참고하는 것도 매우 좋은 방법이다.
 
 ## 8.2. TransPiling
+새로운 문법을 지원하지 않는 브라우저에서 그 코드 자체를 지원 가능 문법으로 바꿔주는 도구가 등장했다.
+Babel과 Traceur이 이러한 TransPiling을 지원하는 도구 중 하나이다.
 
-## 9. Non-JavaScript
+예를들어 
+```
+function foo(a = 2) {
+	console.log( a );
+}
+
+foo();		// 2
+foo( 42 );	// 42
+```
+Js에서는 ES6 버전부터 매개변수에 디폴트 값을 설정할 수 있게 됐다. 이 코드가 ES6문법을 지원하지 않는 브라우저에서 실행되면
+```
+function foo() {
+	var a = arguments[0] !== (void 0) ? arguments[0] : 2;
+	console.log( a );
+}
+```
+다음과 같이 코드가 변경된다.
