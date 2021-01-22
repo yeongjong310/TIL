@@ -183,7 +183,16 @@ TypeError를 발생시킨다.
 1. 스코프는 변수를 어디서 어떻게 찾을지 규정한다.
 2. LHS는 `=` operator 혹은 파라미터를 통해 값이 할당 될 때 발생한다.
 3. RHS는 변수의 값을 찾을 때 발생한다.
-4. 자바스크립트는 코드를 실행하기전 먼저 컴파일 한다. 
+4. 자바스크립트는 코드를 실행하기전 먼저 컴파일 한다.[자세한 내용 back & forth 참고](https://github.com/toryjkim/javascript/blob/main/YDKJS/scope%20&%20closures/ch1.md#21-back--forth-parsing%EA%B3%BC-code-generation-%EA%B3%BC%EC%A0%95)
  - 토큰화와 렉싱 => `var a = 2` 를 `var`, `a`, `=`, `2`로 나누고 각 토큰별로 구분할 수 있도록함.
  - 파싱 => 토큰을 분석해서 노드트리를 만든다. AST(추상 구문 트리)
  - 코드화 => 실행코드를 생성한다.
+5. 변수를 찾을 때 현재 스코프에서 못찾으면 상위 스코프를 계속 탐색한다. (glabal 까지)
+6. 엔진은 RHS에서 변수를 못찾으면 ReferenceError를 발생시키, LHS에서 변수를 못찾으면 global이 새로운 변수를 생성해서 엔진에게 넘겨준다.(stric mode는 다름)
+
+#### 느낀점
+JS도 실행전 컴파일을 한다는 사실을 알게 됐다. 사실 이 ch1이 나에게 도움이 된 부분은 호이스팅과도 연관이 있을 것 같다. 호이스팅에 대해 알고는 있었지만 어떠한 원리로 동작하는 것일까 궁금했는데, 컴파일 과정에서 변수를 모두 파악하고 그 다음 호이스팅 과정이 일어날 것이라는 감이 온다. 이후에 호이스팅 섹션에서 자세히 알아봐야겠다. 그리고 원리와 함께 새로운 지식을 접하는 것은 항상 오래 기억하게 된다. 내가 이 책을 선택한 이유도 JS의 동작과정을 조금 더 깊고 오래 알고 싶었기 때문이다. 다른 책보다 조금은 돌아가는 길일지 모르지만, 이 책을 알게되고 JS에 대해 알아갈 수록 저자에게 감사한 마음이 든다. Thank you.
+##### 참조
+[babel&AST](https://velog.io/@logqwerty/Babel-%EC%BB%B4%ED%8C%8C%EC%9D%BC%EC%9D%84-%EC%82%B4%ED%8E%B4%EB%B3%B4%EC%9E%90)
+[DOM](https://vallista.kr/2019/05/07/DOM-Document-Object-Model/)
+[컴파일](https://hashcode.co.kr/questions/7560/javascript-%EC%9E%90%EB%B0%94%EC%8A%A4%ED%81%AC%EB%A6%BD%ED%8A%B8%EB%8A%94-%EC%BB%B4%ED%8C%8C%EC%9D%BC%EC%96%B8%EC%96%B4%EC%9D%B8%EA%B0%80%EC%9A%94-%EC%9D%B8%ED%84%B0%ED%94%84%EB%A6%AC%ED%84%B0-%EC%96%B8%EC%96%B4%EC%9D%B8%EA%B0%80%EC%9A%94)
