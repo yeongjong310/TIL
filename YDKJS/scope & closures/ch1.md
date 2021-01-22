@@ -11,7 +11,7 @@
 **Note**: tokenizing이 문자들을 각각의 토큰으로 분리하는 것이라면, lexing은 각각의 토큰을 구별할 수 있게 한다.
 2. Parsing: 토큰들을 취해 프로그램의 전체 구조를 나타내는 트리를 만들어 낸다. 컴파일러는 이 트리를 보고 빠르게 코드의 구조를 파악해서 
 에러를 찾아내거나 코드를 변형시킬 수 있다. 
-이러한 트리는 상위 엘리먼트에서 부터 하위 엘리먼트로 이어지는 노드로 구성되고 "AST(Abstract Syntzs Tree)" 라고 부른다.
+이러한 트리는 상위 엘리먼트에서 부터 하위 엘리먼트로 이어지는 노드로 구성되고 "AST(Abstract Syntx Tree)" 라고 부른다.
 3. Code-Generation:
 AST를 보고 실행가능한 코드로 바꾸는 과정이다. 
 
@@ -24,7 +24,7 @@ Scrope를 이해하기 위해 다음 세가지를 알고 넘어가자.
 2. Compiler(컴파일러): Parsing과 code-generation을 수행한다. ( 토큰을 분석해서 AST를 만들고, 실행가능한 코드로 만드는 것. )
 3. Scope(스코프): 선언된 모든 식별자(변수)를 리스트화하고, 어떻게 이 변수에 접근할지 엄격한 규정을 정해 변수들을 관리한다.  
 
-### 2.1. Back & Forth
+### 2.1. Back & Forth (Parsing과 Code-Generation 과정)
 일반적으로 사람이 보기에는 `var a = 2;`가 하나의 명령이지만, Engine에게는 구분되는 두개의 명령이다. 
 첫번째는 컴퍼일러가 `var a = 2;`를 컴파일하는 동안 일어나는 과정, 두번째는 Engine이 이 명령문을 실행하는 과정이다.
 이제 Engine의 입장에서 `var a = 2;`를 살펴보자.
@@ -70,6 +70,120 @@ foo( 2 );
 함수가 선언되고 할당되는 것도 LHS라고 생각할 수 있으나 별개로 생각해야한다.
 왜냐하면 `var foo` and `foo = function(a){...`는 모두 컴파일러가 코드를 생성할 때 이미 처리하기 때문이다. 즉 함수의 할당은 엔진이 수행하지 않아서 `LHS`라고 생각하면 안된다.
 
-## 3. Nested Scope
+#### QUIZ
+```
+fucntion foo(a) {
+  var b = a;
+  return a + b;
+}
 
+var c = foo( 2 );
+```
+
+  1. LHS Look-ups을 찾아라.(3개)
+  2. RHS Look-ups을 찾아라.(4개)
+  
+  > Engine: Scope 혹시 foo 변수 들어봤니? foo에 대한 값을 찾고싶어. **(RHS)**
+  
+  > Scope: 응, 나 foo 가지고있어. 컴파일러가 조금전에 선언했거든. foo는 함수야. 여기~!
+  
+  > Engine: 고마워 Scope. 이제 나는 foo를 실행할 수 있게 됐어.
+  
+  > Engine: 그런데 Scope foo를 실행고보니까 a 지역변수에 2를 할당해야해. 혹시 a 있니? **(LHS)**
+  
+  > Scope: 그럼 있지. 컴파일러가 a를 foo의 파라미터로 선언해놨거든. a 여기있어.
+  
+  > Engine: 고마워. a가 잘 있구나. 이제 a에 2를 할당해야겠어.
+  
+  > ... 잠시후 
+  
+  > Engine: Scope 혹시 a가 변한게 있니..? a값을 어떤 변수에 할당하려고 하는데..확인해봐야할 것 같아. **(RHS)**
+  
+  > Scope: a는 그대로 있어 친구야.
+  
+  > Engine: 고마워 그러면 Scope 혹시 변수 b도 들어봤어? b에 a를 할당하려구. **(LHS)**
+  
+  > Scope: b? 음 잠시만. b는 foo의 지역변수네. 여기있어.
+  
+  > Engine: 항상 고맙다 Scope. 이제 a에 b를 할당해야겠어.
+  
+  > ... 잠시후
+  
+  > Engine: scope a랑 b말이야 잘있니? **(RHS * 2)**
+  
+  > Scope: 응!
+  
+  > Engine: 고마워 a랑 b를 더한 값을 반환해야겠다. 드디어 마지막이네 Scope!! 변수 c에 foo( 2 ) 로 부터 반환된 값을 할당하고 싶어 c가 있어?**(LHS)**
+  
+  > Scope: 응 c는 컴파일러가 잘 선언해줬어. 여기 c야.
+  
+  > Engine: 이제 c에 값을 저장해야겠다.
+  
+## 3. Nested Scope
+우리는 스코프가 식별자를 통해 변수들을 찾고 이런 변수에 대한 규칙을 지정한다는 것을 알게 되었다. 하지만 스코프는 한 개 이상일 수도 있다.
+Block과 Function이라는 울타리가 하나의 규칙을 지정하는 스코프가되고, 이 Block과 Function들이 겹겹이 겹쳐지면 스코프는 다음과 같이 동작하게 된다.
+```
+function foo(a) {
+  console.log( a + b );
+}
+var b = 2;
+
+foo( 2 ); // 4
+```
+엔진은 foo 내부에서 b가 있는지 찾아야 하지만 foo에 대한 스코프가 b를 가지고 있지 않기 때문에 그러지 못한다. 이럴 경우 그 외부의 스코프에게
+변수 b가 있는지 확인하는 절차를 반복적으로 수행한다.(b를 찾을 때 까지 혹은 global에 도달할 때 까지)
+
+> Engine: foo의 scope야 혹시 b 들어봤어? b 값이 필요해 (RHS)
+
+> Scope(foo): 아니 나는 b 안가지고 있는데..? 다음 스코프에게 가봐~
+
+> Engine: 안녕 foo의 밖에 있는 스코프야, 오 너는 global 이구나? 혹시 b 들어봤니?  b값이 필요해 (RHS)
+
+> Scope(global, outside of foo): 응 b 내가 가지고있어. 여기~
+
+### 3.1. Building on metaphors
+이곳은 참조하면 조금 더 이해가 쉬운 것이다. (https://github.com/getify/You-Dont-Know-JS/blob/1st-ed/scope%20%26%20closures/ch1.md#building-on-metaphors)
 ## 4. Errors
+그렇다면 왜 LHS와 RHS로 나눠야하는 걸까? 왜 LHS와 RHS가 중요할까?
+왜냐하면 에러가 발생했을 때 두 개의 look-ups에 따라 다르게 대처해야하기 때문이다.
+다음 예시를 살펴보자.
+```
+function foo(a) {
+  console.log( a + b );
+}
+
+foo( 2 );
+```
+엔진이 foo 내부에서 b에 대한 RHS를 요청하면 이것은 어디서도 선언되지 않았기 때문에 찾을 수 가 없다.
+이렇게 RHS가 변수를 찾는데 실패하면, 엔진은 `ReferenceError`를 발생시킨다.
+
+![image](https://user-images.githubusercontent.com/39623897/105495829-fb738580-5cff-11eb-881d-7cad08ee0d83.png)
+
+반면, LHS를 수행하는 도중 변수를 찾는데 실패하면, 마지막의 global scope는 새로운 변수 b 를 만들어 엔진에게 보내준다.
+```
+function foo(a) {
+  b = a;
+  console.log( "b: ", b );
+}
+
+foo( 2 );
+```
+
+![image](https://user-images.githubusercontent.com/39623897/105495973-2eb61480-5d00-11eb-82ef-4944c29144b6.png)
+
+하지만 `Strict Mode`에서는 조금 다르게 동작한다. 여기서는 global이 새로운 변수를 만드는 것을 금지하기 때문에 RHS 뿐만아니라 LHS에서도 변수를 찾지 못했을경우 엔진은 `ReferenceError`를 발생시킨다.
+
+다음으로 RHS를 통해 변수를 찾았는데, 만약에 함수 아닌 값을 실행시키거나 null, undefined를 실행시킬 경우 엔진은 이 때
+TypeError를 발생시킨다.
+
+즉 `ReferenceError`는 스코프가 변수를 찾지 못했을 때 발생한다. 반면, `TypeError`는 스코프가 변수를 찾았으나 값에 대한 불가능한 시도를 했을 때 발생하는 에러이다.
+
+## 4. Review
+
+1. 스코프는 변수를 어디서 어떻게 찾을지 규정한다.
+2. LHS는 `=` operator 혹은 파라미터를 통해 값이 할당 될 때 발생한다.
+3. RHS는 변수의 값을 찾을 때 발생한다.
+4. 자바스크립트는 코드를 실행하기전 먼저 컴파일 한다. 
+ - 토큰화와 렉싱 => `var a = 2` 를 `var`, `a`, `=`, `2`로 나누고 각 토큰별로 구분할 수 있도록함.
+ - 파싱 => 토큰을 분석해서 노드트리를 만든다. AST(추상 구문 트리)
+ - 코드화 => 실행코드를 생성한다.
