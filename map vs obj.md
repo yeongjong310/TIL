@@ -174,15 +174,28 @@ for (const [key,value] of map) {
 map.forEach((value,key) => console.log(`key: ${key}, value: ${value}`));
 //key: 2, value: 3
 //key: 4, value: 5
-
+```
 ## 3.2. Object
-Object의 경우 for 문을 통해 key만 반환한다.
+- 1. Object의 경우 for ... in 문을 통해 key를 반환한다.
+```
 for (var key in obj) {
   console.log(`key: ${key}, value: ${obj[key]}`);
   //key: id, value: 1
   //key: name, value: test
 }
-또는 Object.keys(obj) 방법으로 keys를 반환하고 Array의 forEach로 각 key에 접근 할 수 있다.
+```
+**Note:** prototype의 속성들도 모두 반환하기 때문에 주의해야함.
+```
+var obj = {name: "123", getName: function(){console.log(this.name);}} 
+var childObj = Object.create(obj);
+childObj.name = "234";
+
+for(key in childObj)
+  console.log(key);
+//name
+//getName
+```
+- 2. 또는 Object.keys(obj) 방법으로 keys를 반환하고 Array의 forEach로 각 key에 접근 할 수 있다. => 자신의 속성만 확인하려면 이 방법을 사용해야함.
 ```
 Object.keys(obj).forEach((key) => console.log(`key: ${key}, value: ${obj[key]}`));
 //key: id, value: 1
