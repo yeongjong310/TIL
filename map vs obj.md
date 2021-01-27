@@ -200,7 +200,7 @@ for(key in childObj)
 Object.keys(obj).forEach((key) => console.log(`key: ${key}, value: ${obj[key]}`));
 //key: id, value: 1
 // key: name, value: test
-
+```
 ## Map, Object를 언제 사용해야 할까?
 
 1. 간단한 객체를 생성할 때는 Object => Object가 Map보다 빠르다.
@@ -214,3 +214,5 @@ Object.keys(obj).forEach((key) => console.log(`key: ${key}, value: ${obj[key]}`)
 코드가 간결해지고 추후에 다시 코드를 보게되었을 때 이점이 많을 듯 하다.
 그 이외 장점은 차차 사용해 보면서 정리해보겠다.
 
+##### 참고
+[map vs object](https://medium.com/front-end-weekly/es6-map-vs-object-what-and-when-b80621932373)
