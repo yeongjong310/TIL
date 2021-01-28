@@ -50,7 +50,7 @@ function test() {
     fn(); // "global name's job is gjob"
 }
 ```
-**note** 콜백함수로 넘겨주는 경우, this는 전역 변수를 가리킨다.
+**note** 객체에 정의된 메소드에 콜백함수로 넘겨주는 경우, this는 전역 변수를 가리킨다.
 ```
 var name = "global";
 var job = "gjob";
