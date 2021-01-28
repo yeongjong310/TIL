@@ -340,9 +340,12 @@ var obj2 = {
 	bar: "obj2"
 }
 
-foo();			// "global" => 함수내에 this로 정의한 프로퍼티가 없다면, this는 전역을 바라본다. 엄격모드에서는 X
+foo();			// "global" => 함수내에 this로 정의한 프로퍼티가 없다면, this는 전역을 바라본다. 하지만 엄격모드의 this는 무조건 자기 자신을 바라보기 때문에 해당 변수가 없는 경우 참조 에러가 발생한다.
+
 obj1.foo();		// "obj1" => obj1의 메소드로 실행될 경우 실행된 메소드 foo안에서의 this는 객체를 바라본다.
+
 foo.call( obj2 );	// "obj2" => call의 인자로받은 obj2가 foo의 this가 된다.
+
 new foo();		// "undefined" 함수로 생성된 객체는 this가 자신을 바라본다.
 ```
 
