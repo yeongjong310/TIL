@@ -50,14 +50,14 @@ function test() {
     fn(); // "global name's job is gjob"
 }
 ```
-**note** 콜백함수로 넘겨주는 경우, this는 무조건 전역 변수를 가리킨다.
+**note** 콜백함수로 넘겨주는 경우, this는 전역 변수를 가리킨다.
 ```
 var name = "global";
 var job = "gjob";
 let outer = {
     name: "outer",
     fn:function(callback){
-        let name = "inner"
+        this.name = "inner"
         callback();
     }
 }
