@@ -6,7 +6,7 @@ arrow function expression은 일반적으로 함수를 정의할 때 사용하�
 **Differences & Limitations:**
 - 함수가 어디에도 바인딩되지 않았기 때문에 browser에서의 this는 Window를 가리킨다. (server side js는 아직 모르겠음)
 - 따라서 super도 사용할 수 없다.(super는 상위 클래스의 생성자를 호출함)
-- call, apply, bind를 사용해서 바인딩 하는 것은 적절하지 않다.
+- 함수를 특정 scope의로 지정하기 위해 call, apply, bind를 사용하는 것은 적절하지 않다.
 - 생성자로 사용될 수 없다.
 - yield도 사용할 수 없다.
 
@@ -105,7 +105,8 @@ var obj = {
 obj.b(); // undefined, Windows {...} (or the global object)
 obj.c(); // 10, Object {...}
 ```
-Arrow funtions는 this를 바인딩하지 않는다. 또 다른 예로, Object.defineProperty()에서도 같다.
+Arrow funtions는 this를 바인딩하지 않는다. 따라서 ** 상위 Scope를 찾아가고 ** 여기서는 Windows를 가리킨다. 
+또 다른 예로, Object.defineProperty()에서도 같은 규칙이 적용된다.
 ```
 'use strict';
 
@@ -123,7 +124,7 @@ Object.defineProperty(obj, 'b', {
 ### 3.2. call, apply and bind는 왜 적합하지 않나?
 
 `call`, `apply` and `bind` 는 다른 scope의 프로퍼티(변수)에 접근하기 위한 메소드들이다. call의 파라미터로 다른 객체를 넘겨주어도
-this는 여전히 window를 가리키기 때문에 의도한 결과와 다른 결과를 반환할 것이다.
+this는 여전히 아무것도 가리키지 않고, 상위 Scope를 가리키기 때문에 의도한 결과와 다른 결과를 반환할 것이다.
 ```
 var obj = {
   num: 100
@@ -141,3 +142,75 @@ var add = function(a, b, c) {
 
 console.log(add.call(obj, 1, 2, 3)) // result 106
 ```
+위와 같이 arrow function expression으로 정의한 add 함수를 obj의 메소드처럼 사용하기 위해 add.call(obj)를 사용하면, add의 this는 여전히 obj를 가리키지 않기 때문에 잘못된 사용이다.
+
+### 3.3 call, apply, bind를 사용할 곳은?(arrow expression을 초점으로)
+콜백함수로 넘어간 함수에서 this는 전역 context를 가리킨다. 이때 전역이 아닌 특정 객체를 bind해서 넘겨주면 해당 객체를 가리키게 된다.
+```
+var obj = {
+    count : 10,
+    doSomethingLater : function (){
+        setTimeout(function(){ 
+            this.count++;
+            console.log(this.count);
+        }.bind(this), 300);
+    }
+}
+obj.doSomethingLater(); // 11
+```
+arrow expression을 사용하면 bion로 묶는 연산이 필요없다. 그 이유는 arrow expression을 일반 regular function expression으로 감싸면 arrow expression 내에서 사용하는 this가 상위 스코프를 타고 객체를 가리키기 때문이다. => 정확한 원리 파악 필요
+
+```
+var obj = {
+    count : 10,
+    doSomethingLater : function (){
+        setTimeout(()=>{ 
+            this.count++;
+            console.log(this.count);
+        }, 300);
+    }
+}
+obj.doSomethingLater(); // 11
+```
+### 3.4. No binding of arguments
+arrows functions는 arguments Object를 가지고 있지 않다. 무쓴 뜻인지 아래 예제를 통해 살펴보자.
+
+** note: ** 일반 함수 선언의 경우 argument는 arguments Object에 할당되고, index로 접근할 수 있다.
+```
+fucntion foo(n) {
+  return arguments[0];
+}
+foo(3); // 3;
+```
+** note: ** arrow functions은 arguments가 없기 때문에 가장 가까운 arguments를 참조한다.
+```
+fucntion foo(n) {
+  var f = () => arguments[0] + n;
+  return f();
+}
+foo(3); // 3 + 3 = 6; => foo의 arguments 참조
+```
+```
+var arguments = [2, 3];
+var foo = n => arguments[0] + n;
+foo(3); // 3 + 2 = 5; => 전역 arguments 참조
+```
+** note: ** 따라서 rest parameters를 사용해서 arguments Object를 대체한다.
+```
+var f = (...args) => args[0] + 10;
+foo(1); // 11
+```
+
+### 3.5 생성자 함수로 사용할 수 없다.
+```
+var Foo = () => {};
+var foo = new Foo(); // TypeError: Foo is not a constructor
+```
+### 3.6. prototype을 가지고 있지 않다.
+```
+var Foo = () => {};
+console.log(Foo.prototype); undefined
+```
+### 3.7 yeild 키워드
+
+
