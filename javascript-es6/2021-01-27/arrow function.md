@@ -211,6 +211,44 @@ var foo = new Foo(); // TypeError: Foo is not a constructor
 var Foo = () => {};
 console.log(Foo.prototype); undefined
 ```
-### 3.7 yeild 키워드
+### 3.7 yield 키워드
+generator는 next 함수를 통해 다음 yeild로 넘어 갈 수 있다. yield는 generator 함수가 중간 멈추는 지점으로 사용된다.
+하지만 arrow function에서는 yield를 사용할 수 없다.
+**note: generator를 사용하기 위해서는 함수를 꼭 변수에 담아 주어야 다음 지점으로 넘어 갈 수 있다.**
+#### 3.7.1 syntax
+```
+function* gen() {
+  yield 1;
+  yiled 2;
+  yiled 3;
+}
+
+var gen = gen();
+
+gen.next(); // {value: 1, done: false}
+gen.next(); // {value: 2, done: false}
+gen.next(); // {value: 3, done: false}
+gen.next(); // {value: undefined, done: true}
+```
+
+### 3.8 Line breaks
+arrow function을 사용할 때 주의할 것은 파라미터와 화살표 기호(=>) 사이에 줄 바꿈이 안된 다는 점이다.
+```
+var foo = (a, b, c)
+  => 1;
+  // SyntaxError: unexpected expression, got '=>'
+```
+하지만 화살표 기호(=>) 다음으로 줄 바꿈은 가능하다.
+```
+var foo = (a, b, c) => 
+  1;
+  
+var foo = (a, b, c) => (
+  1;
+)
+var foo = (a, b, c) => {
+  return 1;
+}
+```
 
 
