@@ -251,7 +251,7 @@ var foo = (a, b, c) => {
 }
 ```
 
-### 3.9 Exambple
+### 3.9 Example
 ```
 let empty = () => {};
 
