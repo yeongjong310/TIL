@@ -251,4 +251,27 @@ var foo = (a, b, c) => {
 }
 ```
 
+### 3.9 Exambple
+```
+let empty = () => {};
 
+(() => 'fooba')();
+
+var simple = a => a > 15 ? 15: a;
+
+let max = (a, b) => a > b ? a : b;
+
+var arr = [5, 6, 7, 8, 9, 4];
+
+const reducer = (accumulator, currentValue) => accumulator + currentValue;
+
+var sum = arr.reduce(reducer); // 39
+
+const evenFilterFunc = value => value % 2 === 0
+
+var even = arr.filter(evenFilterFunc) // [6, 8, 4]
+
+const MakeDoubleFunc = value => value * 2
+
+var double = arr.map(MakeDoubleFunc); // [10, 12, 14, 16, 18, 8]
+```
