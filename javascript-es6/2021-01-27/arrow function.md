@@ -95,7 +95,7 @@ test(1, 2, 3, 4) // 1 2 Array[3,4]
 'use strict';
 
 var obj = {
-  i = 10,
+  i: 10,
   b: () => console.log(this.i, this),
   c: function() {
     console.log(this.i, this);
@@ -158,7 +158,7 @@ var obj = {
 }
 obj.doSomethingLater(); // 11
 ```
-arrow expression을 사용하면 bion로 묶는 연산이 필요없다. 그 이유는 arrow expression을 일반 regular function expression으로 감싸면 arrow expression 내에서 사용하는 this가 상위 스코프를 타고 객체를 가리키기 때문이다. => 정확한 원리 파악 필요
+arrow expression을 사용하면 bind로 묶는 연산이 필요없다. 그 이유는 arrow expression을 일반 regular function expression으로 감싸면 arrow expression 내에서 사용하는 this가 상위 스코프를 타고 객체를 가리키기 때문이다. => 정확한 원리 파악 필요
 
 ```
 var obj = {
@@ -175,14 +175,14 @@ obj.doSomethingLater(); // 11
 ### 3.4. No binding of arguments
 arrows functions는 arguments Object를 가지고 있지 않다. 무쓴 뜻인지 아래 예제를 통해 살펴보자.
 
-** note: ** 일반 함수 선언의 경우 argument는 arguments Object에 할당되고, index로 접근할 수 있다.
+** note: ** 일반 함수 선언문에서의 argument는 arguments Object에 할당되고, index로 접근할 수 있다.
 ```
 fucntion foo(n) {
   return arguments[0];
 }
 foo(3); // 3;
 ```
-** note: ** arrow functions은 arguments가 없기 때문에 가장 가까운 arguments를 참조한다.
+**note:** arrow functions은 arguments가 없기 때문에 상위 스코프에서 arguments를 찾아 참조한다.
 ```
 fucntion foo(n) {
   var f = () => arguments[0] + n;
@@ -195,7 +195,7 @@ var arguments = [2, 3];
 var foo = n => arguments[0] + n;
 foo(3); // 3 + 2 = 5; => 전역 arguments 참조
 ```
-** note: ** 따라서 rest parameters를 사용해서 arguments Object를 대체한다.
+**note:** 따라서 rest parameters를 사용해서 arguments Object를 대체한다.
 ```
 var f = (...args) => args[0] + 10;
 foo(1); // 11
