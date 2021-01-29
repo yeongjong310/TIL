@@ -105,7 +105,7 @@ var obj = {
 obj.b(); // undefined, Windows {...} (or the global object)
 obj.c(); // 10, Object {...}
 ```
-Arrow funtions는 this를 바인딩하지 않는다. 따라서 ** 상위 Scope를 찾아가고 ** 여기서는 Windows를 가리킨다. 
+Arrow funtions는 this를 바인딩하지 않는다. 따라서 **상위 Scope를 찾아가고** 여기서는 Windows를 가리킨다. 
 또 다른 예로, Object.defineProperty()에서도 같은 규칙이 적용된다.
 ```
 'use strict';
