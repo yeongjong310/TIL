@@ -236,7 +236,7 @@ function foo() {
 
 ## 4. Functions As Values
 함수는 실질적으로 값이다. 함수를 변수의 값으로 저장할 수도 있고, 함수 내에서 값으로 리턴되기도 하며, 함수의 파라미터로 입력되기도 한다.
-`
+```
 var foo = function() {      // anonymous 익명인 함수가 변수 foo에 저장됨
 	// ..
 };
@@ -246,6 +246,7 @@ var x = function bar(){     // named 이름 bar로 생성된 함수가 x 변수�
 };
 ```
 이 둘의 차이는 see the Scope & Closures에서 더 깊게 공부한다.
+
 ### 4.1. Immediately Invoked Function Expressions (IIFEs)
 함수를 선언과 동시에 즉시 호출하는 방법도 있다.
 ```
@@ -290,7 +291,7 @@ plusOne( 41 );	// 42 	<-- 1 + 41
 
 plusTen( 13 );	// 23 	<-- 10 + 13
 ```
-makeAdder 함수는 이미 add 함수를 반환했다. 반환 즉시 makeAdder 함수는 끝이났다는 이야기다. 이후에 plusOne( 3 )은 동료된 함수가 반환한 add( 3 )을 실행 시키고 add는 내부적으로 makeAdder의 x 변수에 접근한다.
+makeAdder 함수는 이미 add 함수를 반환했다. 반환 즉시 makeAdder 함수는 끝이났다는 이야기다. 이후에 plusOne( 3 )은 종료된 makeAdder 함수가 반환한 add( 3 )을 실행 시키고 add는 내부적으로 makeAdder의 x 변수에 접근한다.
 ```
 add(3) {
 	return 3 + x;
