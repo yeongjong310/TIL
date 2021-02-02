@@ -27,7 +27,7 @@ a = b * 2;
 ```
 b * 2;
 ```
-그래서 흔히 쓰이는 expression statement는 call expression statement이며, 함수내에 statement들 전체를 불러오는 그 문장 자체를 뜻한다.
+흔히 쓰이는 expression statement는 call expression statement이며, 함수내에 statement들 전체를 불러오는 그 문장 자체를 뜻한다.
 ```
 alert( a );
 ```
