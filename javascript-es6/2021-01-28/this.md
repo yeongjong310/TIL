@@ -1,5 +1,110 @@
 # this
-javascript에서 this는 생각보다 복잡한 규칙에 의해 정의된다. 각 규칙에 의해 this가 가리키는 곳은 어떻게 달라지는지 정리한다.
+javascript에서 this는 복잡한 규칙에 의해 정의된다. 또한 strict mode와 non-strict mode에서 this가 의미하는 바가 달라지기 때문에
+this가 어떤 의미인지 헷갈리기 쉽다. 그래서 이번 시간에는 this를 완벽하게 파헤치고 정리해 보려고 한다.
+
+- 대부분의 경우 this는 함수가 어디서 실행되는지에 따라 결정된다. 
+- 실행중에 this에 어떤 값을 할당할 수 없다.
+
+## 1 Syntax
+> this
+
+### 1.1. value
+non-strict mode에서는 실행되는 context(global, function or eval)의 property이며 this는 항상 object를 참조한다.
+그리고 strict mode에서의 this는 어느 값이든 될 수 있다.
+
+## 2. Description
+### 2.1. Global context
+global context에서는 this가 window를 가리킨다. window가 전역객체이기 때문이다.
+```
+console.log(this === window); // true
+
+a = 37;
+console.log(window.a);
+
+this.b = "MDN";
+console.log(window.b); // "MDN"
+console.log(b); // "MDN"
+```
+**Note:** 현재 실행되고있는 어떤 context에서도 쉽게 global object에 접근하는 방법이 있다. [globalthis](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/globalThis) 는 항상 global object를 가리킨다.
+
+### 2.2. Function context
+non-strict mode인 경우에, 함수 내부에서의 this는 함수가 어떻게 실행됐는지에 따라 바뀐다.
+
+1. strict mode?
+2. call, bind, apply에 의해 this를 특정한 객체로 지정했는가?
+
+아래 예시는 1번과 2번 모두 해당하지 않기 때문에 this는 기본적으로 global object를 가리킨다.
+
+```
+function f1() {
+return this;
+}
+
+// In a browser:
+f1() === window; // true
+
+// In Node:
+f1() === globalThis; //true
+```
+
+하지만, 아래 예시처럼 strict mode이며, context가 실행될 때 this가 설정되지 않는다면 this는 `undefined` 이다.
+```
+function f2() {
+  'use strict'; // see strict mode
+  return this;
+}
+
+f2() === undefined; // true
+window.f2() === undefined; // false => window object의 메소드로 실행되었다. this는 해당 object인 window를 가리킨다.
+```
+
+this를 특정한 값으로 설정하기 위해서는 call(), apply(), bind()를 사용해라.
+
+### 2.3. Class context
+class에서 this는 하나의 객체이다. this는 class로 인해 생성되는 객체 자신을 가리킨다. 또한 모든 non-static methods(static이 붙지 않은 method)는 this의 property에 추가된다. 
+```
+class Example {
+  constructor() {
+    const proto = Object.getPrototypeOf(this); // this는 각 객체를 가리키고 각 객체의 prototype은 Example의 prototype이다.
+    console.log(Object.getOwnPropertyNames(proto)); 
+  }
+  first(){} // this의 prototype에 추가됨
+  second(){} // this의 prototype에 추가됨
+  static third(){} //this의 prototype에 추가되지 않음, static은 class 자신의 properties이다. => static은 나중에 다시 알아보자.
+}
+
+new Example(); // ['constructor', 'first', 'second']
+```
+
+### 2.4. Derived classes
+class 생성자가 다른 생성자들로 부터 상속되었다면, this는 기본적으로 instance에 binding 되지 않는다. 
+따라서 constructor 내에서 this를 사용하면 에러가 발생한다. 하지만 super()를 불러오면 부모 class의 생성자를 호출하고, this를 instance에 binding 한다. super() 는 다음 코드와 같은 효과가 있다.
+
+> this = new Base(); // this에 Base instance를 할당하면 this가 Base instance를 가리켜야하는데, 자식 instance를 가리킨다... 따라서 이 코드는 적절한 예시가 아닌것 같다....
+
+> **Warning**: super()를 호출하기 전에 this를 언급하면 에러가 발생한다.
+
+그 이유는 생성자가 반환하는 값이 곧 instance(생성된 객체)가 되기 때문인데, 예제를 보며 살펴보자.
+```
+class Base {} // 기본 class는 constructor가 있으나 없으나 Base의 prototype을 참조하는 instance를 생성한다.
+class Good extends Base {} // 상속된 class에서 생성자가 없는 경우는, instance가 Good property를 자동으로 참조하고 디음으로 Base도 참조한다.
+class AlsoGood extends Base { // 생성자가 있고 객체를 반환하는 경우, 생성자로 부터 그 객체가 생성된다.
+  contructor() {
+    return {a: 5};
+  }
+}
+class Bad extends Base { //생성자가 있다면 무조건 return하게 된다. 그런데 super를 호출하지 않으면 자식 class가 부모 class의 생성자 정보를 알 수 없기 때문에 error. => 그냥 constructor를 사용하려면 super를 무조건 쓰자!
+  constructor() {}
+}
+new Good();
+new AlsoGood();
+new Bad(); // ReferenceError: Must call super constructor in derived class before accessing 'this' or returning from drived constructor
+```
+
+## 3. Examples
+
+### 3.1. this in function contexts.
+
 
 ### 1. 함수 내부에서 사용되는 this
 
@@ -179,3 +284,7 @@ function으로 전역함수를 감싸준다. => 이유: 정확한 이유는 모�
 ### 답
 문제1) yeongjong's job is fe developer
 문제2) undefined's job is undefined
+
+
+##### 참고
+[this](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/this)
