@@ -38,11 +38,12 @@ console.log(laptop2.ram); //16
 
 ![this 프로퍼티](https://user-images.githubusercontent.com/39623897/103166930-436ecc00-486a-11eb-8ba0-12557aa64e8f.JPG)
 
-두 객체를 비교해보면 첫번째 this를 통한 프로터티를 설정할 경우 생성된 객체 laptop1의 property로 cpu와 ram이 등록되는 반면, 두번째 prototype 방식은 laptop1의 __proto__라는 property에 cpu와 ram 이 저장되었다.
+두 객체를 비교해보면 첫번째 this를 통해 프로퍼티를 설정할 경우 생성된 객체 laptop1의 property로 cpu와 ram이 등록되는 반면, 두번째 prototype 방식은 laptop1의 __proto__ 라는 property에 cpu와 ram 이 저장되었다.
 
 ## 2. how does it work?
-function을 선언/할당하면 prototype이라는 객체가 항상 그 속성으로 같이 생성된다. 이 prototype에 우리는 cpu와 ram을 속성으로 저장했고, 함수 생성자를 통해 생성된 객체(laptop1)의 __proto__에는 cpu와 ram을 포함한 Object가 할당되어 있다.
-즉 객체가 생성될시 그 속성인 __proto__는 생성자의 prototype과 연결되어 있다는 뜻이며 따라서 객체가 이미 생성된 이후일 지라도 해당 생성자의 prototype에 속성을 추가하면 연결된 모든 객체는 추가된 속성을 접근 할 수 있다.
+함수는 [일급객체](https://ko.wikipedia.org/wiki/%EC%9D%BC%EA%B8%89_%EA%B0%9D%EC%B2%B4) 이기 때문에 프로터피를 만들 수 있다. 그래서 함수를 선언하면 prototype이 함수의 기본 프로퍼티로 함께 생성된다. 이 prototype 또한 하나의 객체인데, 그 쓰임은 함수(생성자)를 통해 생성된 모든 객체가 "__proto__" 라는 프로퍼티를 가지게 되면서 이 프로퍼티는 함수(생성자)의 property(객체)의 주소를 참조하게 된다. 생성되는 모든 객체가 하나의 property를 바라보고 있으니 property에 저장되는 데이터는 모든 객체에게 공유된다. 객체가 이미 생성된 이후일 지라도 해당 생성자의 prototype에 속성을 추가하면 연결된 모든 객체는 추가된 속성에 접근 할 수 있다.
+
+예제에서는 cpu와 ram을 prototype의 property로 저장했다. 따라서 함수 생성자를 통해 생성된 객체(laptop1)의 __proto__ 는 cpu와 ram을 포함한 prototype을 참조한다.
 
 ![이후 추가](https://user-images.githubusercontent.com/39623897/103169504-87200080-487f-11eb-8552-e6db35d449df.JPG)
 
@@ -84,8 +85,8 @@ class는 function과 마찬가지로 object를 만들고 초기화 하기위해 
 ![image](https://user-images.githubusercontent.com/39623897/103210609-7c31a280-4949-11eb-986d-943726ace988.png)
 
 ### 5.2. hoisting
-class는 표현식과 선언식 둘다 사용할 수 있으나 function의 선언식은 hoisting되어 먼저 호출 후 선언해도 문제가 되지 않았지만
-class의 표현식 선언식 모두 TDZ에 빠지게 되고 선 선언 그 후 호출해야 정상적으로 에러없이 동작한다.
+class는 표현식과 선언식으로 사용될 수 있다. 하지만 function의 선언식은 hoisting되어 선 호출, 후 선언 구조에서도 문제가 되지 않았지만
+class의 표현식 선언식 모두 TDZ에 빠지게 되고 선 선언, 후 호출해야 정상적으로 실행된다.
 
 ### 5.3 class expressions(클래스 표현식)
 ```
@@ -98,15 +99,15 @@ let computer1 = new Computer(); // Uncaught ReferenceError: Computer is not defi
 
 ```
 #### 5.3.1 named class expressions
-클레스 표현식을 사용할 때 한가지 주의할 점이 있다. 1번과 같이 클래스 표현식에서 이름없는 '익명 클레스'를 사용하는 경우가 일반적이나
-2번처럼 이름과 같이 사용할 수 있는데 이를 기명 클래스 표현식(Named Class Expressions)이라고 하며, 이 경우 class화 함께 기제한 이름인 Computer를 통해 object를 생성할 수 없고, 변수명인 Desktop을 사용해야 한다. Computer는 클래스의 name 속성으로 저장되게 된다. 그렇다면 Computer는 어떻게 쓰일까?
+클래스 표현식을 사용할 때 한가지 주의할 점이 있다. 1번과 같이 클래스 표현식에서 이름없는 '익명 클레스'를 사용하는 경우가 일반적이나
+2번처럼 이름과 같이 사용할 수 있는데 이를 기명 클래스 표현식(Named Class Expressions)이라고 하낟. 이 경우 class와 함께 기제한 Computer를 사용해 object를 생성할 수 없고, 변수명인 Desktop을 사용해야 한다. 그렇다면 Computer는 어디서 어떻게 쓰일까? Computer는 클래스의 name 속성으로 저장된다. 
 
 ```
 추후 기입 예정
 ```
 
 ## 6. review
-기존까지 Javascript를 단순히 동적인 표현을 위한 언어로 생각했다. 주먹구구식으로 구현을 위주로 한 Javascript를 인터넷으로 배우게 되었고 그동안 시간이 없다는 핑계로 단순히 최대한 빠르게 구현하는 것에 내 생각이 멈춰있었는데 동시에 기본기를 탄탄하게 다질 필요가 있겠다는 생각이 들었다. 결론적으로 이번 학습에서는 Javascript의 object를 구성하는 원리와 내재한 메소드가 어떻게 동작하는지 알 수 있었던 계기가 되었다. 그동안 짐작으로 구현했던 나 자신을 반성하며 앞으로는 이렇게 하나하나 지식을 탐구하며 아는 것에 그치지 않고 때에 따라 정확하고 효과적으로 그 지식을 사용할 수 있는 사람이 되고자 한다. 이 길이 결국 더 빠른 길이라는 믿음과 함께 리뷰를 마친다.
+비교적 최근까지 Javascript를 단순히 동적인 표현을 위한 언어로 생각했다. 오로지 기능을 구현하기 위해 Javascript를 조금씩 인터넷으로 배우게 되었는데, 기능이 어떻게 동작하는지 모를때면 시간이 없다는 핑계로 원리를 파악하지 못했던 경우가 많았따. 하지만 원리를 파악해서 기본기를 탄탄하게 다지는 것이 결과적으로 빠른 길이라는 것을 알게되고난 후로 이제는 확실하게 알고 사용하자라는 신념이 생겼다. 이번 학습에서는 Javascript의 object를 구성하는 원리와 내재한 메소드가 어떻게 동작하는지 알아보았고, 그동안 짐작으로 구현했던 나 자신을 반성하며 올바른 길로 향해가자.
 
 
 
