@@ -9,12 +9,12 @@ this가 어떤 의미인지 헷갈리기 쉽다. 그래서 이번 시간에는 t
 > this
 
 ### 1.1. value
-non-strict mode에서는 실행되는 context(global, function or eval)의 property이며 this는 항상 object를 참조한다.
-그리고 strict mode에서의 this는 어느 값이든 될 수 있다.
+non-strict mode에서는 실행되는 context(global, function or eval)의 property이며 **this는 항상 object를 가리킨다**.
+그리고 strict mode에서의 this는 설정하기에 따라 어느 값이든 될 수 있다.
 
 ## 2. Description
 ### 2.1. Global context
-global context에서는 this가 window를 가리킨다. window가 전역객체이기 때문이다.
+기본적으로 global context에서는 this가 window를 가리킨다. window가 전역객체이기 때문이다.
 ```
 console.log(this === window); // true
 
@@ -37,7 +37,7 @@ non-strict mode인 경우에, 함수 내부에서의 this는 함수가 어떻게
 
 ```
 function f1() {
-return this;
+  return this;
 }
 
 // In a browser:
@@ -61,7 +61,7 @@ window.f2() === undefined; // false => window object의 메소드로 실행되�
 this를 특정한 값으로 설정하기 위해서는 call(), apply(), bind()를 사용해라.
 
 ### 2.3. Class context
-class에서 this는 하나의 객체이다. this는 class로 인해 생성되는 객체 자신을 가리킨다. 또한 모든 non-static methods(static이 붙지 않은 method)는 this의 property에 추가된다. 
+class에서 this는 하나의 객체이다. this는 class로 인해 생성되는 객체 자신을 가리킨다. 또한 모든 non-static methods(static이 붙지 않은 method)는 this의 prototype에 추가된다. 
 ```
 class Example {
   constructor() {
@@ -80,9 +80,9 @@ new Example(); // ['constructor', 'first', 'second']
 class 생성자가 다른 생성자들로 부터 상속되었다면, this는 기본적으로 instance에 binding 되지 않는다. 
 따라서 constructor 내에서 this를 사용하면 에러가 발생한다. 하지만 super()를 불러오면 부모 class의 생성자를 호출하고, this를 instance에 binding 한다. super() 는 다음 코드와 같은 효과가 있다.
 
-> this = new Base(); // this에 Base instance를 할당하면 this가 Base instance를 가리켜야하는데, 자식 instance를 가리킨다... 따라서 이 코드는 적절한 예시가 아닌것 같다. 내가 짐작한 바로 super의 역할은 다음과 같다.
+> this = new Base(); // this에 Base instance를 할당하면 this가 Base instance를 가리켜야하는데, 자식 instance를 가리킨다... 따라서 이 코드는 적절한 예시가 아닌것 같다. 따라서 super의 역할을 다음 두 가지로 알아두면 좋겠다.
 
-1. this가 자식 instance를 가리킨다.
+1. this가 자식 instance를 가리키게 된다.
 2. 부모 생성자의 코드를 실행한다.
 
 > **Warning**: super()를 호출하기 전에 this를 언급하면 에러가 발생한다.
@@ -128,7 +128,7 @@ function add(c, d) {
 
 var o = {a: 1, b: 3};
 
-// 첫번 째 파라미터는 객체이다. 이 객체는 function의 this가 된다.
+// 첫번 째 파라미터는 객체이다. function 내부에서 사용되는 this가 이 객체를 가리키게 된다.
 // subsequent parameters(다음으로 오는 파라미터들)은 함수가 실행될 때 arguments(실제 값)로 입력된다.
 add.call(o, 5, 7); // 16
 
@@ -170,7 +170,7 @@ console.log(o.a, o.f(), o.g(), o.h()); // 37, 37, 'azerty', 'azerty'
 ```
 
 ### 3.4. Arrow functions
-Aroow functions에서 `this`는 둘러싸고 있는 lexical context (외부 context)의 this를 유지한다. 예를들어 외부 context의 this 가 global 이라면, bind, apply 등 어떠한 규칙을 동원해 `this`를 세팅하더라고 Arrow function 내부의 `this`는  global object를 유지한다.
+Aroow functions에서 `this`는 둘러싸고 있는 lexical context **(외부 context)** 의 this를 유지한다.(lexical scope는 inner function에서는 outer function의 변수에 접근할 수 있지만, 반대는 불가능한 scope의 특징) 예를들어 외부 context의 this 가 global 이라면, bind, apply 등 어떠한 규칙을 동원해 `this`를 세팅하더라고 Arrow function 내부의 `this`는  global object를 유지한다.
 
 ```
 var globalObject = this;
@@ -184,28 +184,120 @@ console.log(obj.func() === globalObject); // true, arrow function을 사용했�
 
 console.log(foo.call(obj) === globalObject); // true, 이하 같은 이유
 ```
-객체의 메소드로 regular function을 생성하고, 내부에 arrow function을 사용해도 this는 여전히 lexical context의 `this`와 동일하다.
-
-
-
-### 1. 함수 내부에서 사용되는 this
-
-함수 내부에서 사용되는 this는 기본적으로 함수 자신을 가리킨다. 하지만 내부에 호출하는 프로퍼티가 없다면 외부 Scope를 찾아간다.
+obj의 bar에 일반 function으로 method를 할당하고, arrow function으로 `this`를 리턴하는 경우를 살펴보자. 리턴된 arrow function의 `this`는 **arrow function을 둘러싸고 있는 외곽 context**의 this와 동일시 된다. 예시를 살펴보자.
 ```
-var bar = "outer"
-function foo() {
-  this.bar = "inner";
-  console.log( this.bar );  // "inner"
+var obj = {
+  bar: function() {
+    var x = (() => this);
+    return x;
+  }
+};
+var fn = obj.bar(); // bar이 실행되면 arrow function이 생성된다. 생성되는 순간 this는 외곽 context인 obj를 가리키게 된다.
+console.log(fn() === ojb); true
+
+var fn2 = obj.bar; // 하지만 bar를 global에 저장해서 실행되는 아래와 같은경우는 외곽 contex가 global을 가리키기 때문에 window가 된다.
+console.log(f2()() == window); true
+```
+
+### 3.5. As an object method
+함수가 object의 method로 **실행될 때**, `this`는 이 method를 호출하는 object로 설정된다.
+```
+var o = {
+  prop: 37,
+  f: function() {
+    return this.prop;
+  }
+};
+
+console.log(o.f()); // 37
+```
+function이 어디서, 어떻게 정의됐는지와 전혀 상관없이 이 규칙이 적용된다. 
+```
+var o = {prop: 37};
+
+function independent() {
+  return this.prop;
 }
+
+o.f = independent;
+
+console.log(o.f()); // 37
 ```
+그리고, 이 규칙은 겹겹이 쌓인 객체에서 단계를 거쳐 호출하더라고 `this`는 마지막에 그 method를 호출하는 객체를 가리키게 된다.
 ```
-var bar = "outer"
-function foo() {
-  console.log( this.bar );  // "outer"
-}
+o.b = {g: independent, prop: 42};
+console.log(o.b.g()); // 42
 ```
 
-**note**: 엄격모드의 경우 함수 내부에 정의된 프로퍼티가 없다면 TypeError가 발생한다.
+#### 3.5.1. `this` on the object's prototype chain
+prototype에도 이 규칙이 적용된다.
+```
+var o = {
+  f: function() {
+    return this.a + this.b
+  }
+};
+var p = Object.create(o);
+p.a = 1;
+p.b = 4;
+
+console.log(p.f()); //5
+```
+p는 f를 o로 부터 상속 받았다. 그리고 p에서 f 메소드를 호출할 때 o에서 찾게된다. 그렇더라고 p.f 즉 p를 통해 f를 호출하고 있기 때문에
+this는 p를 가리킨다.
+
+#### 3.5.2. this whit a getter or setter
+마찬가지로 setter와 getter에서 this를 사용한다면 `this`는 그 getter와 setter를 부르는 object를 가리킨다.
+```
+function sum() {
+  return this.a + this.b + this.c;
+}
+
+var o = {
+  a: 1,
+  b: 2,
+  c: 3,
+  get average() {
+    return (this.a + this.b + this.c) / 3;
+  }
+};
+
+Object.defineProperty(o, 'sum', {
+  get: sum, emuerable: true, configuarable: true});
+  
+console.log(o.average, o.sum); // 2, 6
+```
+
+### 3.6 As a constructor
+생성자로 함수가 사용될 때, this는 생성되는 object를 가리킨다.
+
+**note:** 생성자의 역할은 생성될 object를 반환하는 것이다. 하지만 다른 object를 반환할 수도 있다.
+```
+생성자는 다음과 같이 동작한다.
+// this에 의해 설계된 property를 생성한다. ex) this.fum = "nom";
+// function 이 반환하느 object가 있다면 그 object가 new expression에 의해 생성되는 object가 된다.
+// 따라서 Myconstructor의 prototype과 연결된 __proto__(function의 prototype을 가리킴 => 모든 function은 prototype을 가지고있다)를 속성으로 가지는 object가 생성된다. ex ){ fum = "nom", __proto__: Object }
+// new 생성자를 사용하면 이 object를 반환한다.
+
+function Myconstructor() {
+  this.a = 37;
+}
+
+var o = new C();
+console.log(o.a); // 37
+
+function c2() {
+  this.a = 37;
+  return {a: 38};
+}
+
+o = new C2();
+console.log(o.a); //38
+```
+- 요약: function이 반환하는 값이 new expression의 객체로 생성된다. 
+- new 생성자를 사용하면 return 문이 없어도 this로 설계한 object가 생성되며 자동으로 반환된다.
+- 하지만, 함수 끝에 return으로 어떤 값을 반환하면 위의 과정이 무시되며, 반환된 값을 object로 변환하기를 시도하여 그 값이 object로 생성된다.
+  
 
 ### 2. 메소드의 this
 메소드의 this 는 부모 객체를 가리킨다.(메소드 내부에서 this를 사용하지 않았다고 가정했을 경우) 
@@ -225,13 +317,12 @@ obj.printJob() // tory's job is Js master
 let fn = obj.printJob;
 fn(); // undefined's job is undefined
 -------------------------------------------
-function test() {
-    this.name = "test name";
-    this.job = "test job";
-    let fn = obj.printJob
-    fn(); // "test name's job is test job"
+let test = {
+    name: "test",
+    job: "empty",
+    fn: obj.printJob
 }
-test();
+test.fn(); // test's job is empty
 -------------------------------------------
 var name = "global";
 var job = "gjob";
@@ -241,7 +332,8 @@ function test() {
 }
 ```
 **note** 객체에 정의된 메소드에 콜백함수를 넘겨주는 경우, this는 전역 변수를 가리킨다.  
-내 예상은 지역변수 callback에 obj.printJob이 할당되면서 obj의 메소드인 printJob에서 가리키는 this는 해제되고, 외부스코프(부모 객체)를 찾아갈 것이라 생각했는데 어떤 이유로 this 가 바로 전역 context를 가리키는지는 아직 모르겠다.
+내 예상은 지역변수 callback에 obj.printJob이 할당되면서 obj의 메소드인 printJob에서 가리키는 this는 해제되고, 외부스코프(부모 객체)를 찾아갈 것이라 생각했는데 어떤 이유로 this 가 바로 전역 context를 가리키는지는 아직 모르겠다.  
+**+:** outer의 fn이 실행되면, callback에 obj.prinJob이 할당될 것이다. 이후 callback() 함수가 실행되니 outer의 fn이라는 속성으로 함수에 접근하는 것이 아니라 callback이라는 지역변수로 자체로 접근하게 되고 this는 global을 가리키는 것이라 추정이된다.
 ```
 var name = "global";
 var job = "gjob";
