@@ -80,7 +80,10 @@ new Example(); // ['constructor', 'first', 'second']
 class 생성자가 다른 생성자들로 부터 상속되었다면, this는 기본적으로 instance에 binding 되지 않는다. 
 따라서 constructor 내에서 this를 사용하면 에러가 발생한다. 하지만 super()를 불러오면 부모 class의 생성자를 호출하고, this를 instance에 binding 한다. super() 는 다음 코드와 같은 효과가 있다.
 
-> this = new Base(); // this에 Base instance를 할당하면 this가 Base instance를 가리켜야하는데, 자식 instance를 가리킨다... 따라서 이 코드는 적절한 예시가 아닌것 같다....
+> this = new Base(); // this에 Base instance를 할당하면 this가 Base instance를 가리켜야하는데, 자식 instance를 가리킨다... 따라서 이 코드는 적절한 예시가 아닌것 같다. 내가 짐작한 바로 super의 역할은 다음과 같다.
+
+1. this가 자식 instance를 가리킨다.
+2. 부모 생성자의 코드를 실행한다.
 
 > **Warning**: super()를 호출하기 전에 this를 언급하면 에러가 발생한다.
 
@@ -104,6 +107,85 @@ new Bad(); // ReferenceError: Must call super constructor in derived class befor
 ## 3. Examples
 
 ### 3.1. this in function contexts.
+```
+var obj = {a: 'Custom'};
+
+var a = 'Global';
+
+function whatsThis() {
+  return this.a;
+}
+
+whatsThis();          // 'global' 함수 내에서 this가 정의되지 않았기 때문에, this는 global/window object를 가리키다.
+whatsThis.call(obj);  // 'Custom' 함수 내의 this 가 call에 의해 obj로 설정되었기 때문에, this는 obj를 가리킨다.
+whatsThis.apply(obj);  // 'Custom' 함수 내의 this 가 aplly에 의해 objs로 설정되었기 때문에, this는 obj를 가리킨다.
+```
+### 3.2. this and object onversion
+```
+function add(c, d) {
+  return this.a + this.b + c + d;
+}
+
+var o = {a: 1, b: 3};
+
+// 첫번 째 파라미터는 객체이다. 이 객체는 function의 this가 된다.
+// subsequent parameters(다음으로 오는 파라미터들)은 함수가 실행될 때 arguments(실제 값)로 입력된다.
+add.call(o, 5, 7); // 16
+
+// 첫번 째 파라미터는 객체이다. 이 객체는 function의 this가 된다.
+// 두번 째 파라미터는 배열이다. 이 배열의 요소들이 arguments(실제 값)으로 입력된다.
+add.apply(o, [10, 20]); // 34
+```
+**Note:** 
+1. non-strict mode에서 call과 apply의 첫번 째 파라미터로 객체가 입력되지 않으면 자동으로 객체로 변환된다. ex) 7 or 'foo'와 같은 원시값은  연관된 생성자를 이용해 Object로 변환된다. new Number(7), new String('foo'). e.g. 
+2. null과 undefined가 입력되면 this는 global/ window object를 가리킨다.
+
+```
+function bar() {
+  console.log(Object.prototype.toString.call(this));
+}
+
+bar.call(7) // [object Number]
+bar.call('foo') // [object String]
+bar.call(undefined); [object global]
+```
+
+### 3.3. The bind method
+bind는 입력받은 객체를 this로 하는 새로운 function을 생성한다. 그리고 그 function은 기존의 함수를 대체한다.
+bind와 (apply, call)의 차이점은 apply, call이 함수를 실행하며 this를 변경하기 때문에 일회성이지만, bind는 함수를 실행하지 않고 this가 할당된 새로운 함수를 생성하기 때문에 영구적으로 그 function을 사용할 수 있다는 것이다.
+
+```
+function f() {
+  return this.a;
+}
+
+var g = f.bind({a: 'azerty'});
+console.log(g()); // azerty
+
+var h = g.bind({a: 'yoo')}; bind는 오직 한번만 적용된다.
+console.log(h()); azerty
+
+var o = {a: 37, f: f, g: g, h: h};
+console.log(o.a, o.f(), o.g(), o.h()); // 37, 37, 'azerty', 'azerty'
+```
+
+### 3.4. Arrow functions
+Aroow functions에서 `this`는 둘러싸고 있는 lexical context (외부 context)의 this를 유지한다. 예를들어 외부 context의 this 가 global 이라면, bind, apply 등 어떠한 규칙을 동원해 `this`를 세팅하더라고 Arrow function 내부의 `this`는  global object를 유지한다.
+
+```
+var globalObject = this;
+var foo = (() => this);
+console.log(foo() === globalObjec); // true;
+```
+bind, apply, call 을 사용해 this를 설정하면 this에 대한 설정은 무시된다. 하지만 bind, apply, call 메소드가 여전히 동작하기 때문에 첫 번째 argument만 null로 바뀌게 되며 나머지 arguments들은 그대로 함수의 parameter에 전달된다. 
+```
+var obj = {func: foo};
+console.log(obj.func() === globalObject); // true, arrow function을 사용했기 때문에, obj.func()의 this는 obj가 아닌 global이다.
+
+console.log(foo.call(obj) === globalObject); // true, 이하 같은 이유
+```
+객체의 메소드로 regular function을 생성하고, 내부에 arrow function을 사용해도 this는 여전히 lexical context의 `this`와 동일하다.
+
 
 
 ### 1. 함수 내부에서 사용되는 this
