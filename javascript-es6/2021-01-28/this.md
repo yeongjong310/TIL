@@ -297,7 +297,11 @@ console.log(o.a); //38
 - 요약: function이 반환하는 값이 new expression의 객체로 생성된다. 
 - new 생성자를 사용하면 return 문이 없어도 this로 설계한 object가 생성되며 자동으로 반환된다.
 - 하지만, 함수 끝에 return으로 어떤 값을 반환하면 위의 과정이 무시되며, 반환된 값을 object로 변환하기를 시도하여 그 값이 object로 생성된다.
-  
+
+### 3.7. As a Dom Event handler
+### 3.8. In an inline event handler
+### 3.9. this in classes
+
 
 ### 2. 메소드의 this
 메소드의 this 는 부모 객체를 가리킨다.(메소드 내부에서 this를 사용하지 않았다고 가정했을 경우) 
