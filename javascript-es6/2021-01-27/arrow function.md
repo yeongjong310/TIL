@@ -1,10 +1,10 @@
 # arrow function expressions
 arrow function expressions 에 대해 자세히 정리해 보자.
 
-arrow function expression은 일반적으로 함수를 정의할 때 사용하는 function expression을 간단한 문법으로 대체한 표현식이다.
+arrow function expression은 기존에 함수를 정의할 때 사용해온 function expressions를 비교적 간단한 문법으로 대체한 것이다.
 
 **Differences & Limitations:**
-- 함수가 어디에도 바인딩되지 않았기 때문에 browser에서의 this는 Window를 가리킨다. (server side js는 아직 모르겠음)
+- 함수가 어디에도 바인딩되지 않았기 때문에 browser에서의 this는 Window를 가리킨다. (server side js는 실험해보지 않음)
 - 따라서 super도 사용할 수 없다.(super는 상위 클래스의 생성자를 호출함)
 - 함수를 특정 scope의로 지정하기 위해 call, apply, bind를 사용하는 것은 적절하지 않다.
 - 생성자로 사용될 수 없다.
@@ -40,11 +40,11 @@ a => a + 100;
 ```
 > 위 코드에서 보았듯이 {}, (), return은 option 이다. 때에 따라 적절히 사용할 수 있게 완전히 자신은 것으로 만들어야 한다.
 
-예를들어, argument가 2개 이상인 경우 ()는 필수이다.
+예를들어, argument가 2개 이상인 경우 ()를 사용하는 것은 필수다.
 ```
 (a, b) => a + b + 100;
 ```
-또한, 실행될 명령문이 두 줄 이상인 경우 {}과 return은 필수이다.
+또한, 실행될 명령문이 두 줄 이상인 경우는 {}과 return을 함께 사용해야 한다.
 ```
 (a, b) => {
   let chunk = 42l
