@@ -9,10 +9,7 @@ Scope는 동작하는 방법에 따라 2가지로 나뉜다.
 
 ## 1. Lex-time
 이전 챕터에서 잠깐 살펴본 바와 같이 lexing process는 나눠진 token에 의미를 부여한다.
-lexical scope는 이 lexing time에 정의된다.
-lexical scope는 개발자가 코드를 작성할 때, scope의 variables와 blocks가 어디서 작성되는지에 따라 
-설정된다고 볼 수 있다. 그리고 lexer가 이 코드를 처리할 때 확정한다.
-
+사실상 lexical scope는 개발자가 코드를 작성할 동안, function과 blocks를 어떻게 작성했고, valuable을 어디서 사용했는지에 따라 정의된다. 그리고 실제로 프로그램이 실행될 때의 scope는 개발자가 작성한 코드를 lexer가 해석해고 lexical scope 확정한다. 이로인해 프로그램이 실행되면 engine은 이미 정의된 scope 내에서 원하는  빠르게 찾을 수 있다.
 
 ### 1.1. Look-ups
 `foo.bar.baz` 와 같이 객체를 통해 프로펄티를 불러오는 경우에는 맨 앞의 식별자만 look up한다.
@@ -107,8 +104,7 @@ foo({}) // 2;
 ```
 
 ### 2.3. Performance
-js는 engine은 compile하는 동안 프로그램을 최적화 시키기 위한 많은 것들을 수행한다. 코드를 분석하고, 변수와 함수들을 미리 선언하는 것 덕분에
-engine은 적은 노력으로 빠르게 프로그램을 실행한다.
+js는 engine은 compile하는 동안 프로그램을 최적화 시키기 위한 많은 일들을 수행한다. 코드를 분석하고, 변수와 함수들을 미리 선언한 덕분에 engine은 적은 노력으로 빠르게 프로그램을 실행한다.
 
 하지만, eval과 with로 인해 lexical scope를 수정하는 행위는 이런 수고들을 파괴하는 행위로 최적된 코드를 모두 망쳐버린다.
 
