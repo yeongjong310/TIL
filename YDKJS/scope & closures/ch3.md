@@ -229,5 +229,151 @@ var a = 2;
 
 # 4. Blocks As Scopes
 
+Function 단위로만 스코프를 지정하는 것 보다 더 세부적으로 변수의 사용범위를 제한할 수 없을까? 
+```
+for (var i = 0; i < 10; i ++) {
+    console.log( i );
+}
+console.log( i ); // 10
+```
+i는 for문 내에서만 사용하려고 했지만 의도와는 다르게 global 영역을 침범했다.
+
+이때 우리는 block 단위로 scope를 지정할 수 있다. block scope란 {} 중괄호를 감싸는 블록이 하나의 scope가 되어 변수범위를 제한하는 것이다.
+
+## 4.1. `with`
+이전 ch2에서 배웠던 `with`를 다시 생각해보자. `with`는 새로운 scope를 생성한다. 그리고 그 scope 내에서 선언한 변수는 외부 scope로 빠져나가지 않았다. 그 이유는 with가 생성한 scope는 with {}(블록) 내부 적으로 변수의 사용을 제한하는 block scope 이기 때문이다.
+```
+var test = { a: 1 }
+with(test){
+    console.log(a); // 1
+    var b = 10;
+}
+
+console.log( b ); // undefined
+```
+
+## 4.2. `try/catch`
+ES3부터 지원하는 `try/catch`도 block scope를 지원한다.
+```
+try{
+	var test = "test";
+    undefined(); // undefined는 함수가 아니기 때문에 error 발생
+} catch (err) {
+	console.log( err );
+}
+
+console.log( err ); //ReferenceError: `err` not found
+```
+
+위와 같이 `catch`문은 block scope를 적용한다.
+**note:** 어떤 linter(코드style을 분석해서 개발자에게 style적인 문제를 지적한다.)에서는 하나의 scope에 두 개의 try/catch 문을 사용하고 catch문에 똑같은 변수 이름을 사용하면 마치 식별자가 중복된 것 처럼 인식하는 문제가 있다. 이를 해결하기 위해 개발자들은 `err1, err2`와 같은
+형태로 변수를 선언한다.
+
+## 4.3. `let`
+이제 본격적으로 block scope와 관련되 `let`을 살펴보자.
+어떤 {} 블록이든 내부에서 let으로 변수를 선언하면 그 변수는 해당 block에서만 사용할 수 있게 된다.  
+
+```
+var foo = true;
+
+if (foo) {
+	let bar = foo * 2;
+	bar = something( bar );
+	console.log( bar) ;
+}
+
+console.log( bar ); // ReferenceError
+```
+### 4.3.1. Block을 조금 더 명확하게 사용하자. 
+아래와 같이 {}을 명시하면 추후에 코드를 refactoring 하기도 쉽고 변수가 어디서 어디까지 쓰이는지 눈으로 확인하기도 쉽다.
+```
+var foo = true;
+
+if (foo) {
+	{ // <-- explicit block
+		let bar = foo * 2;
+		bar = something( bar );
+		console.log( bar );
+	}
+}
+
+console.log( bar ); // ReferenceError
+```
+
+**note:** let은 var와 달리 선언전에 실행할 수 없다.
+
+
+### 4.3.2. let with loops
+let은 for과 함께 사용하면 금상첨화다.
+```
+for (let i = 0; i < 10; i++) {
+	console.log( i );
+}
+
+console.log( i ); // ReferenceError
+```
+
+**note:** for의 head부분에 let으로 변수를 정의하면 loop문이 반복될 때 마다 매번 let이 해당 scope에 새롭게 정의된다.
+그 이유는 ch 5에서 자세히 살펴본다. 
+
+## `const`
+let과 더불어 const도 변수를 block-scope로 제한하는 keyword이다.
+```
+var foo = true;
+
+if (foo) {
+	var a = 2;
+	const b = 3; // block-scoped to the containing `if`
+
+	a = 3; // just fine!
+	b = 4; // error!
+}
+
+console.log( a ); // 3
+console.log( b ); // ReferenceError!
+```
+하지만, let과 다른점은 const는 한번 할당된 값을 수정하지 못한다.
+
+
+
+## 4.4. Garbage Collection
+block scope를 사용하는 또 다른 이유로, closure와 garbage collection이 있다. closure는 ch5에서 살펴보고 garbage colelction을 알아보자.
+```
+function process(data) {
+	// do somehing interesting
+}
+
+var someReallyBigData = { .. };
+
+process( someReallyBigData );
+
+// process, someReallyBigData are no longer needed after this line. But these still will be alive. => garbage
+var btn = document.getElementById( "my_button" );
+
+btn.addEventListener( "click", function click(evt){
+	console.log("button clicked);
+}, false );
+```
+someReallyBigData와 process는 process가 실행된 이후로는 필요하지 않다. 그 이후로는 메모리만 차지하고 있는 쓰레기 더미에 불과하다.
+block scope를 사용하면 이런 문제를 해결할 수 있다.
+
+```
+function process(data) {
+	// do something interesting
+}
+
+// anything declared inside this block can go away after!
+{
+	let someReallyBigData = { .. };
+
+	process( someReallyBigData );
+}
+
+var btn = document.getElementById( "my_button" );
+
+btn.addEventListener( "click", function click(evt){
+	console.log("button clicked");
+}, /*capturingPhase=*/false );
+```
 
 
