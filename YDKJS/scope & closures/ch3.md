@@ -118,8 +118,7 @@ foo(); // <-- and this
 
 console.log( a ); // 2
 ```
-이처럼 말이다. 하지만 때로는 이보다 더 뛰어난 방법이 있다. 만약 global에서 foo가 필요하지 않다면, 다음과 같이 함수를 작성함과 동시에
-사용하는 방법이 있다.
+이처럼 말이다. 위와 같이 함수를 선언하고 실행하는 목적은 선언한 함수를 재사용하기 위해서다. 하지만 재사용 할 필요가 없다면, global에 선언 foo는 scope 영역을 교란시킬 뿐이다. 이를 해결하기 위한 아주 좋은 방법이 있다.
 
 ```
 var a = 2;
@@ -133,30 +132,29 @@ var a = 2;
 
 console.log( a ); // 2
 ```
-이렇게 하면 foo가 global에 노출지 않고, foo를 선언함과 동시에 실행된다.
 
-foo는 함수 표현식으로 사용된다.
+이렇게 함수 선언문을 `()`로 감싸고 끝에 함수를 실행하는 `()`를 붙이면 foo는 global에 노출지 않고, foo를 선언함과 동시에 실행된다.
+이렇게 바로 실행하는 함수를 IIFE(Immediately Invoked Function Expression) 라고하며 함수 표현식의 일종이다.
+함수 표현식의 특징중 하나는 function의 이름이 해당 scope의 identifier(식별자)로 사용되지 않는다는 점이다. 앞서 말한것 처럼 IIFE로 선언한 함수의 이름도 scope의 identifier로 등로되지 않는다.
+
 **note:** 표현식과 선언문을 구분하는 쉬운 방법은 라인의 시작이 function인지 아닌지 확인하는 것이다.
 
-함수 표현식 특징중 하나는 function의 이름이 identifier(식별자)가 되지 않는다는 점이다.
 ```
 var a = function b() {}
 ```
-function b의 식별자는 a이다.
-
-이처럼 foo도 식별자가 되지 않기에 위 코드는 단 한번만 사용할 수 있다. 즉 global을 오염시키지도 않는다.
+일반적인 표현식을 보면 function의 이름은 `b` 이지만 scope에 등록되는 identifier는 `a`이다.
 
 ## 3.1. Anonymous vs. Named
-함수 표현식은 이름없이 사용할 수 있고, 함수 선언문은 불가능하다. 이름없는(Anonymous) 함수는 일반적으로 이름있는 함수보다 빠르고
-작성하기도 쉽다. 하지만 사용하기전 몇 가지는 생각해볼 필요가 있다.
+함수 표현식은 이름없이 사용할 수 있고, 함수 선언문은 불가능하다. 그리고 이름없는(Anonymous) 함수는 일반적으로 이름있는 함수보다 빠르고
+작성하기도 쉽다. 하지만 이름없는 함수를 사용하기전에 몇 가지는 고려해야 필요가 있다.
 
-1. Anonymous functions는 이름이 없다. 따라서 debugging이 더 힘들다.
-2. 이름이 없기 때문에 재귀함수 같이 function 내부에서 자신을 부르는 구조로 사용할 수 없다. 이름 없는 함수를 재귀로 사용하려면
+1. Anonymous functions는 이름이 없다. 따라서 디버깅 때 어디서 오류가 났는지 확인하기 힘들다.
+2. 이름이 없기 때문에 재귀함수와 같이 function 내부에서 자신을 부르는 구조로 사용하기 힘들어진다. 이름 없는 함수를 재귀로 사용하려면
 이제는 잘 사용하지 않는 arguments.callee를 사용해야 한다.
 3. 이름이 없기 때문에 함수가 어떤 기능을 하는지 유추하기 어렵다.
 
 ### 3.1.1. Immediately Invoked Function Expression.
-style 적으로 두가지 방법이 있다.
+IIEF를 사용할 수 있는 방법은 style 적으로 두가지 방법이 있다.
 1. `(function foo(){})();` 실행문() 이 바깥에 있다.
 ```
 var a = 2;
@@ -183,10 +181,9 @@ var a = 2;
 
 console.log( a ); // 2
 ```
-이 둘은 기능적으로는 같다.
-
-IIFE에 argument를 넣어줄 수 도 있다.
-
+이 둘의 기능은 동일하다.
+#### 3.1.1.1 IIFE 활용하기
+1. IIFE에 argument를 넣어줄 수 도 있다.
 ```
 var a= 2;
 (function IIFE( global ) {
@@ -197,9 +194,7 @@ var a= 2;
 
 console.log( a ); // 2
 ```
-#### 3.1.1.1 IIFE 활용하기
-
-1. parameter 이름을 undefined로 지정하면 argument가 입력되지 않았음을 확인 할 수 있다.
+2. parameter 이름을 undefined로 지정하면 argument가 넘어오지 않았음을 확인 할 수 있다.
 ```
 undefined = true; // setting a land-mine for other code! avoid!
 
@@ -212,10 +207,11 @@ undefined = true; // setting a land-mine for other code! avoid!
 
 })();
 ```
-function의 지역변수로 undefined를 overwrite될 수 있다. 이런 상황을 방지하기 위해 undefined를 파라미터로 입력하면
+function scope에서는 undefined가 overwrite될 수 있다. 이런 상황을 방지하기 위해 undefined를 파라미터로 입력하면
 위와 같이 undefined의 의미를 보존할 수 있다.
 
-2. callback 함수로 사용하기
+3. callback 함수
+
 ```
 var a = 2;
 
