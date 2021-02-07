@@ -4,9 +4,9 @@ ch3. Function vs Block scope
 # 1. Scope From Functions
 js 는 기본적으로 Function에 의해 scope가 생성된다.
 
-scope가 생성되기 때문에, 각 scope마다 고유의 식별자를 가지고 있을 수 있다.
+scope 덕분에 서로의 영역을 침범하지 않는 고유의 식별자를 가지고 있을 수 있다.
 
-예를들어
+예를들어 아래 코드는 2개의 function이 있기 때문에 global을 포함한 총 3개의 scope 영역이 있다고 생각하면 된다.
 ```
 function foo(a) {
 	var b = 2;
@@ -22,11 +22,12 @@ function foo(a) {
 	var c = 3;
 }
 ```
-global은 foo를, foo에는 `a,b,c`, `bar`를, bar에는 bar만의 식별자를 가지게된다.
+global은 foo를, foo에는 `a,b,c`, `bar`를, bar에는 bar만의 식별자를 가지게 된다.
 
 이렇게 scpoe를 나누면 좋은 점을 소개한다.
 
-# 1. hiding in plain scope
+# 2.Hiding In Plain Scope
+# 2.1. hiding in plain scope
 
 ```
 function doSomething(a) {
@@ -44,9 +45,9 @@ var b;
 doSomething( 2 ); // 15
 ```
 
-다음과 같은경우 b와 doSomethingElse는 global부터 모든 scope에서 사용할 수 있다.
-하지만 실질적으로 b와 doSomethingElse는 doSomething에서만 사용하고 있기 때문에, 굳이 global에서 까지 사용할 필요가 없다.
-추후에 어떤 일이 발생할지 모르기 때문에 필요한 곳에서만 변수를 사용할 수 있게 해야한다.
+위 코드를 보면 b와 doSomethingElse는 어디서든 사용할 수 있다.
+하지만 실질적으로 b와 doSomethingElse는 doSomething에서만 사용하고 있기 때문에, 굳이 global 영역까지 침범할 필요가 없다.
+추후에 어떤 일이 발생할지 모르기 때문에 필요한 곳에서만 변수를 사용할 수 있게 제한하는 것은 매우 중요하다.
 
 ```
 function doSomething(a) {
@@ -62,12 +63,13 @@ function doSomething(a) {
 }
 
 doSomething( 2 ); // 15
-```
-위와 같이 코드를 수정하면 doSomething 안에서만 변수와 함수를 사용하도록 제한할 수 있다.
 
-# 2.Hiding In Plain Scope
-# 2.1 collision Avoidance
-충돌을 방지하는데도 효과적이다.
+console.log(b); // Refference error
+```
+코드를 위와 같이 수정하면 doSomething 안에서만 변수와 함수를 사용할 수 있게 제한할 수 있다.
+
+# 2.2. collision Avoidance
+충돌을 방지할 수 있다.
 ```
 function foo() {
 	function bar(a) {
@@ -82,14 +84,13 @@ function foo() {
 
 foo();
 ```
-예시가 조금 억지스럽지만, for문 내에서 정의한 i는 foo의 scope에 속하게 된다.
+예시가 조금 억지스럽지만, function 내부에서 i에 3을 할당하는 명령문은 (var,let,const)를 사용하지 않았기 때문에 우선 lexical scope에서 i를 찾는다. for문 내에서 i를 foo scope에 정의했기 때문에 bar 내부의 i는 foo의 i를 가리키고 i는 3을 유지하게 된다. 이렇게 for문은 10 이하인 3을 계속 유지하고 개발자의 의도와 달리 반복문은 영원히 끝이 나지 않는다.
 
-foo 내부에서 `i = 3`을 실행할 때, i는 LHS로 for에서 정의한 i를 참조한다. 즉 foo 내부에서 사용하는 i는 모두 하나의 i를 가리킨다.
-function 내부의 `i = 3;`을 `var i = 3;`으로 변경하면 문제가 해결된다.
+function 내부의 `i = 3;`을 `var i = 3;`으로 변경하면 i는 bar scope에 저장되며 문제가 해결된다.
 
-## 2.1.1 Global "Namespaces"
+## 2.2.1 Global "Namespaces"
 library 같은 경우 많은 함수, 변수를 포함하고 있다. 따라서 다수의 library를 동시에 import하는 경우 의도치 않게 중복되는 identifier가
-생길 것이다. 이때 사용하는 방법은 object와 같은 다양한 값들을 global scope의 변수인 Namespace에 할당하는 것이다.
+생길 것이다. 이때 사용할 수 있는 방법은 object와 같은 다양한 값들을 global scope의 변수에 할당하는 것이다.
 ```
 var MyReallyCoolLibrary = {
 	awesome: "stuff",
@@ -101,10 +102,10 @@ var MyReallyCoolLibrary = {
 	}
 };
 ```
-위 예제는 MyReallyCoolibarary 안에 object를 삽입함으로써 MyReallyCoolibarary를 통해서만 접근할 수 있다.
+위 예제는 MyReallyCoolibarary 안에 object를 할당했다. 이제 MyReallyCoolibarary를 통해서만 각 프로퍼티, 메서드에 접근할 수 있기 때문에 global에 노출되지 않아 충돌을 방지 할 수 있다.
 
 # 3. Functions As Scopes
-지금까지 함수를 선언해서 변수의 접근을 제한했다. 
+지금까지 함수에 따라 생성되는 scope에 대해 알아봤다. 
 ```
 var a = 2;
 
@@ -118,7 +119,7 @@ foo(); // <-- and this
 
 console.log( a ); // 2
 ```
-이처럼 말이다. 위와 같이 함수를 선언하고 실행하는 목적은 선언한 함수를 재사용하기 위해서다. 하지만 재사용 할 필요가 없다면, global에 선언 foo는 scope 영역을 교란시킬 뿐이다. 이를 해결하기 위한 아주 좋은 방법이 있다.
+위와 같이 함수를 선언하는 방식으로 말이다. 함수를 선언한 후에 실행하는 가장 큰 이유는 선언한 함수를 재사용하기 위해서다. 하지만 재사용 할 필요가 없다면, global에 선언된 foo는 scope 영역을 교란시킬 뿐이다. 이를 해결하기 위한 아주 좋은 방법이 있다.
 
 ```
 var a = 2;
@@ -134,15 +135,15 @@ console.log( a ); // 2
 ```
 
 이렇게 함수 선언문을 `()`로 감싸고 끝에 함수를 실행하는 `()`를 붙이면 foo는 global에 노출지 않고, foo를 선언함과 동시에 실행된다.
-이렇게 바로 실행하는 함수를 IIFE(Immediately Invoked Function Expression) 라고하며 함수 표현식의 일종이다.
-함수 표현식의 특징중 하나는 function의 이름이 해당 scope의 identifier(식별자)로 사용되지 않는다는 점이다. 앞서 말한것 처럼 IIFE로 선언한 함수의 이름도 scope의 identifier로 등로되지 않는다.
+이렇게 바로 실행하는 함수를 IIFE(Immediately Invoked Function Expression) 라고하며 이것은 함수 표현식의 일종이다.
+함수 표현식의 특징중 하나는 function의 이름이 해당 scope의 identifier(식별자)로 등록되지 않는다는 점이다. 앞서 말한것 처럼 IIFE로 선언한 함수의 이름도 scope의 identifier로 등록되지 않는다.
 
 **note:** 표현식과 선언문을 구분하는 쉬운 방법은 라인의 시작이 function인지 아닌지 확인하는 것이다.
 
 ```
 var a = function b() {}
 ```
-일반적인 표현식을 보면 function의 이름은 `b` 이지만 scope에 등록되는 identifier는 `a`이다.
+일반적인 함수 표현식을 보면 function의 이름은 `b` 이지만 scope에 등록되는 identifier는 `a`이다.
 
 ## 3.1. Anonymous vs. Named
 함수 표현식은 이름없이 사용할 수 있고, 함수 선언문은 불가능하다. 그리고 이름없는(Anonymous) 함수는 일반적으로 이름있는 함수보다 빠르고
@@ -181,7 +182,8 @@ var a = 2;
 
 console.log( a ); // 2
 ```
-이 둘의 기능은 동일하다.
+이 둘은 기능상 같다.
+
 #### 3.1.1.1 IIFE 활용하기
 1. IIFE에 argument를 넣어줄 수 도 있다.
 ```
@@ -194,13 +196,13 @@ var a= 2;
 
 console.log( a ); // 2
 ```
-2. parameter 이름을 undefined로 지정하면 argument가 넘어오지 않았음을 확인 할 수 있다.
+2. parameter 이름을 undefined로 지정해서 argument가 넘어오지 않았음을 확인 할 수 있다.
 ```
 undefined = true; // setting a land-mine for other code! avoid!
 
 (function IIFE( undefined ){
 
-	var a;
+	var a; // declare a
 	if (a === undefined) {
 		console.log( "Undefined is safe here!" );
 	}
@@ -241,15 +243,16 @@ i는 for문 내에서만 사용하려고 했지만 의도와는 다르게 global
 이때 우리는 block 단위로 scope를 지정할 수 있다. block scope란 {} 중괄호를 감싸는 블록이 하나의 scope가 되어 변수범위를 제한하는 것이다.
 
 ## 4.1. `with`
-이전 ch2에서 배웠던 `with`를 다시 생각해보자. `with`는 새로운 scope를 생성한다. 그리고 그 scope 내에서 선언한 변수는 외부 scope로 빠져나가지 않았다. 그 이유는 with가 생성한 scope는 with {}(블록) 내부 적으로 변수의 사용을 제한하는 block scope 이기 때문이다.
+이전 ch2에서 배웠던 `with`를 다시 생각해보자. `with`는 새로운 scope를 생성한다. 그리고 with 내의 변수들은 lexical scope가 적용된다. 따라서 `b = 3`의 경우 스코프 내에 b가 없기 때문에 선언한 변수는 외부 scope로 빠져나가 버린다. 즉 입력된 test scope와 별개로 새로운 block scope가 생성.
 ```
 var test = { a: 1 }
 with(test){
     console.log(a); // 1
-    var b = 10;
+    b = 3;
 }
 
-console.log( b ); // undefined
+console.log( test.b ); // undefined
+console.log( b ); // 3
 ```
 
 ## 4.2. `try/catch`
@@ -262,7 +265,7 @@ try{
 	console.log( err );
 }
 
-console.log( err ); //ReferenceError: `err` not found
+console.log( err ); //ReferenceError: `err` not defined
 ```
 
 위와 같이 `catch`문은 block scope를 적용한다.
@@ -284,7 +287,7 @@ if (foo) {
 
 console.log( bar ); // ReferenceError
 ```
-### 4.3.1. Block을 조금 더 명확하게 사용하자. 
+### 4.3.1. if, for 뒤에 따라오는 Block과는 별개의 Block을 명시해보자. 
 아래와 같이 {}을 명시하면 추후에 코드를 refactoring 하기도 쉽고 변수가 어디서 어디까지 쓰이는지 눈으로 확인하기도 쉽다.
 ```
 var foo = true;
@@ -300,7 +303,7 @@ if (foo) {
 console.log( bar ); // ReferenceError
 ```
 
-**note:** let은 var와 달리 선언전에 실행할 수 없다.
+**note:** let은 var와 달리 선언전에 실행할 수 없다. => hoisting 과정에서 선언만 일어나고 메모리에 할당되지 않기 때문(TDZ)
 
 
 ### 4.3.2. let with loops
@@ -317,7 +320,7 @@ console.log( i ); // ReferenceError
 그 이유는 ch 5에서 자세히 살펴본다. 
 
 ## `const`
-let과 더불어 const도 변수를 block-scope로 제한하는 keyword이다.
+let과 더불어 const도 변수를 block-scope에 제한하는 keyword이다.
 ```
 var foo = true;
 
@@ -337,7 +340,7 @@ console.log( b ); // ReferenceError!
 
 
 ## 4.4. Garbage Collection
-block scope를 사용하는 또 다른 이유로, closure와 garbage collection이 있다. closure는 ch5에서 살펴보고 garbage colelction을 알아보자.
+block scope를 사용하는 또 다른 이유로, closure와 garbage collection이 있다. closure는 ch5에서 살펴보고 garbage collction을 알아보자.
 ```
 function process(data) {
 	// do somehing interesting
