@@ -174,3 +174,19 @@ function foo() {
 	console.log( 2 );
 };
 ```
+
+일반 블록 내에 함수를 선언하는 경우..? 어떻게 될까? Js 버전에 따라 변하는 듯 하다.
+우선 구글 88.0.4324.146 버전에서 실험해본 결과 type에러가 발생했다.
+즉 foo가 if block의 첫번째 줄에서 `var foo`를 선언하고 lexical scope가 적용되어 global에 선언되었거나, 단순히 block scope가
+적용되지 않았거나 여러가지 경우로 추측해 볼 수 있다. 결론적으로 블록 내에서 function을 선언하는 것은 좋지 않다.
+```
+foo(); // Uncaught TypeError: foo is not a function
+
+var a = true;
+if (a) {
+   function foo() { console.log( "a" ); }
+}
+else {
+   function foo() { console.log( "b" ); }
+}
+```
