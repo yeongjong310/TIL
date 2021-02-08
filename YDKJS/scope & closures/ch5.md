@@ -425,8 +425,8 @@ var outValue;
 
 function test(){
 	var innerValue = ["123"];
-	outValue = innerValue;
-	outValue.push("456");
+	outValue = innerValue; // 지역변수의 주소를 외부변수에 저장!
+	outValue.push("456"); // 외부변수에 push..
 	
 	function getInnerValue() {
 		return innerValue;
@@ -438,8 +438,25 @@ function test(){
 }
 testModule = test();
 testModule.getInnerValue(); // ["123", "456"];
-outValue.push("789");
+outValue.push("789"); // 외부에서 push했을 때 지역변수도 같이 추가되었다.
 testModule.getInnerValue(); // ["123", "456", "789"];
+```
+심지어 내부 함수를 반환하지 않아도 주소 참조가 유지됨.
+```
+var b;
+
+function a() {
+    var a = [1];
+    b = a; // 외부변수에 push! b는 이제 [1]이다.
+    function display() {
+        return a
+    }
+    return a;
+}
+
+var test = a();
+b.push(2);
+console.log(test); // [1,2] !!!
 ```
 
 그리고 closure를 공부할 목적이었지만 module에 대해서도 많이 알게된 시간이었다.
