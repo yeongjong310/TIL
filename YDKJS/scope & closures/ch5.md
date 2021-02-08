@@ -1,7 +1,7 @@
 # Closure
 
 ## 1. Enlightenment
-closure는 특별한 것이 아니다. closure은 우리가 Js를 사용할 때 이미 주변에 있던 친숙한 것이다.  
+closure는 특별한 것이 아니다. closure는 본인도 모르게 사용해왔던 우리에게 친숙한 것이다.
 
 ## 2. Nitty Gritty
 클로저의 사전적 정의는 아래와 같다.
@@ -20,8 +20,7 @@ function foo() {
 foo();
 }
 ```
-bar scope에 포함되지 않는 a 를 lexical scope인 foo에서 찾는 과정을 기억해 놓자. 우리가 배운 scope 규칙에 의하면 bar는 foo의 밖에서는
-사용할 수 없다. 왜냐하면 foo의 내부 함수로 선언되었기 때문이다. 그렇다면 bar 함수를 반환하면 어떻게 될까?
+closure는 lexical scope와 아주 연관이 깊다. bar scope에 포함되지 않는 a 를 lexical scope인 foo에서 찾는 과정을 생각해보자. 우리가 배운 scope 규칙에 의하면 bar는 foo의 밖에서는 사용할 수 없다. 왜냐하면 foo의 내부 함수로 선언되었기 때문이다. 그렇다면 bar 함수를 반환하면 어떻게 될까?
 
 ```
 function foo() {
@@ -269,8 +268,79 @@ var foo = (function CoolModule(id) {
 })( "foo module" );
 ```
 
-
 ### 5.1. Modern Modules
+하지만 현대에는 위의 방법에 조금 변화를 주어 모듈을 유동적으로 추가하는 방법을 사용한다.
+```
+var  MyModules = (function Manager() {
+	var modules = {}; // 모듈 기능을 저장할 객체 생성.
+	
+	// name: 생성할 모듈의 이름, deps: 기존 모듈의 이름이 담긴 배열(재사용을 위함), newModule: 새로 정의할 모듈 
+	function define(name, deps, newModule) { 
+		for (var i = 0; i < deps.length; i ++) {
+			deps[i] = modules[deps[i]]; // 기존 모듈 객체(modules[deps[i]])를 찾아 deps[i]에 저장한다.
+		}
+		modules[name] = newModule.apply(newModule, deps); // apply를 사용하는 이유는 deps의 개수에 맞춰 newModule의 파라미터로 입력하기 위함.
+	}
+	
+	function get(name) {
+		return modules[name];
+	}
+	
+	return {
+		define: define,
+		get: get
+	}
+})();
+```
+
+Manager는 define, get 메소드를 제공하는 object를 반환한다. 이 object는 module을 생성하고 불러오는 Manager 역할을 한다.
+define의 `modules[name] = newModule.apply(newModule, deps);`를 보면 modules(모듈이 담긴 객체)에 원하는 모듈을 할당한다.
+그리고 get 메소드로 modules에 담긴 모듈을 불러온다.
+ 
+**실습**: 간단한 모듈 만들어보기.
+```
+MyModules.define("operator", [], function() {
+	function sum(a, b) {
+		let result = a + b;
+		if( result !== result )
+			throw "enter valid values"
+		return a + b;
+	}
+	
+	return {
+		sum: sum
+	};
+});
+
+MyModules.define("calculator", ["operator"], function(operator) {
+	var currentValue = 0;
+	function display(){
+		console.log("current value is ", currentValue);
+	}
+	
+	function plus(value){
+		if( value !== value )
+			throw "enter valid value"
+		currentValue = operator.sum(currentValue, value);
+		display();
+	}
+	
+	return {
+		display: display,
+		plus: plus
+	}
+});
+
+var operator = MyModules.get( "operator" );
+var calculator = MyModules.get( "calculator" );
+
+console.log(operator.sum(1, 2)); // 3
+calculator.plus(1); // current value is 1
+calculator.plus(); // enter valid value
+calculator.plus(2); // current value is 3
+```
 ### 5.2. Future Modules
+지금까지는 function based module 방식을 알아보았다. 이 방식은 한가지 문제점이 있다.
+function이 실행되어야 module이 생성되기 때문에
 
 ## 6. Review
