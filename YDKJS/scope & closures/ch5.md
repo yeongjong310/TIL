@@ -454,3 +454,5 @@ testModule.getInnerValue(); // ["123", "456", "789"];
 [Modules: CommonJS modules](https://nodejs.org/api/modules.html)
 
 [Modules: ECMAScript modules](https://nodejs.org/docs/latest-v15.x/api/esm.html#esm_enabling)
+
+[The Revealing Module Pattern in Javascript](https://gist.github.com/zcaceres/bb0eec99c02dda6aac0e041d0d4d7bf2)
