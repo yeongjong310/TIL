@@ -453,4 +453,4 @@ testModule.getInnerValue(); // ["123", "456", "789"];
 ##### 참고
 [Modules: CommonJS modules](https://nodejs.org/api/modules.html)
 
-[Modules: ECMAScript modules[(https://nodejs.org/docs/latest-v15.x/api/esm.html#esm_enabling)
+[Modules: ECMAScript modules](https://nodejs.org/docs/latest-v15.x/api/esm.html#esm_enabling)
