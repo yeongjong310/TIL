@@ -449,3 +449,7 @@ testModule.getInnerValue(); // ["123", "456", "789"];
 - 초기: 메소드 형채로 객체 반환 + IIFE로 모듈 비전역화
 - 중기: 모듈 매니저( 모듈을 정의하는 define, 모듈을 부르는 get)
 - 후기: 모듈의 파일화( import, export | require, export.moduleName, module.exports )
+
+##### 참고
+[Modules: CommonJS modules](https://nodejs.org/api/modules.html)
+[Modules: ECMAScript modules[(https://nodejs.org/docs/latest-v15.x/api/esm.html#esm_enabling)
