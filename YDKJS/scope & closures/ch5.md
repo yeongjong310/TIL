@@ -441,3 +441,11 @@ testModule.getInnerValue(); // ["123", "456"];
 outValue.push("789");
 testModule.getInnerValue(); // ["123", "456", "789"];
 ```
+
+그리고 closure를 공부할 목적이었지만 module에 대해서도 많이 알게된 시간이었다.
+
+1. js의 초창기에는 funcation based module만 지원하기 때문에 inline 문법(같은 파일내에 정의)을 사용했다.
+2. 모듈을 편리하게 사용하려는 다양한 시도가 있었다.
+- 초기: 메소드 형채로 객체 반환 + IIFE로 모듈 비전역화
+- 중기: 모듈 매니저( 모듈을 정의하는 define, 모듈을 부르는 get)
+- 후기: 모듈의 파일화( import, export | require, export.moduleName, module.exports )
