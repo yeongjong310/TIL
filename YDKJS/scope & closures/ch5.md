@@ -1,7 +1,7 @@
 # Closure
 
 ## 1. Enlightenment
-closure는 특별한 것이 아니다. closure는 본인도 모르게 사용해왔던 우리에게 친숙한 것이다.
+closure는 특별한 것이 아니다. closure는 본인도 모르게 계속 사용해왔던 우리에게 너무 친숙한 것이다.
 
 ## 2. Nitty Gritty
 클로저의 사전적 정의는 아래와 같다.
@@ -40,9 +40,7 @@ baz(); // 2 -- closure was just observed, man!
 함수 bar는 값으로 반환되었다. 그리고 그 값이 baz에 할당되어 실행되었다. 하지만 baz는 bar를 참조하고 있기 때문에 
 실질적으로 실행되는 함수는 bar이다. bar는 분명히 lexical scope인 foo 내부에서만 사용할 수 있는데 어떻게 밖에서 실행됐을까? 
 이것이 바로 closure 때문이다. 
-**closure는 함수의 주소 값이 lexical scope의 외부로 보내지는 과정에서 그 변수에 담긴 함수를 실행될 때 까지 lexical scope를 보존하고 참조하는
-과정을 의미한다.**  만약에 closure가 없다면, 일반적으로 함수가 종료된 시점에서 garbege collector가 더 이상 사용하지 않는 메모리를
-치워버린다. 즉 함수가 종료되면 해당 scope에서 선언된 모든 것들은 할당해제 될 것이다.
+**closure는 함수의 주소 값이 lexical scope의 외부로 보내지는 과정에서 그 변수에 담긴 함수를 실행될 때 까지 lexical scope를 보존하고 참조하는 과정을 의미한다.**  만약에 closure가 없다면, 일반적으로 함수가 종료된 시점에서 garbege collector가 더 이상 사용하지 않는 메모리를 치워버린다. 즉 함수가 종료되면 해당 scope에서 선언된 모든 것들은 할당해제 될 것이다.
 
 closure 예시를 몇 가지 더 살펴보자.
 
@@ -340,7 +338,106 @@ calculator.plus(); // enter valid value
 calculator.plus(2); // current value is 3
 ```
 ### 5.2. Future Modules
-지금까지는 function based module 방식을 알아보았다. 이 방식은 한가지 문제점이 있다.
-function이 실행되어야 module이 생성되기 때문에
+지금까지는 function based module 방식을 알아보았다.
+function이 실행되어야 module이 생성되기 때문에 function이 실행되는 중간에 얼마든지 module이 포함할 API를 객체에 넣거나 빼는등 수정할 수 있었다. 즉 module의 API는 run-time 과정에서 결정된다는 의미이다. 
 
+반면에 ES6 모듈 부터는 API가 run-time 과정에서 결정되지 않고, compile-time 단계에서 결정되는 새로운 문법이 추가되었다.
+compile-time 단계에서 API가 결정되었을 때의 장점은, API를 참조할 때 실제로 API가 존재하는지 확인하는 단계를 compile-time에서 수행하여 
+미리 error 처리를 할 수 있다는 점이다. function based module 방식은 run-time 단계에서 module이 생성된 후 API를 참조하는 코드에 도달해야 
+error를 처리할 수 있었다.
+
+ES6 모듈 문법에 대해 알아보자. ES6의 모듈은 각 모듈마다 새로운 파일에 정의한다. 그리고 각 browser와 engine은 이 모듈들을 다른 파일로 동기화 하기 위한 loader를 가지고 있다.  
+
+
+#### 실습
+1. 우선 13.2 버전 이상의 node.js를 설치한다.
+2. 모듈을 저장한다. 
+```
+// ../module/Module.js
+
+var  MyModules = (function Manager() {
+	var modules = {}; // 모듈 기능을 저장할 객체 생성.
+	function define(name, deps, newModule) { 
+		for (var i = 0; i < deps.length; i ++) {
+			deps[i] = modules[deps[i]];
+		}
+		modules[name] = newModule.apply(newModule, deps);
+	}
+	function get(name) {
+		return modules[name];
+	}
+	return {
+		define: define,
+		get: get
+	}
+})();
+
+export { MyModules };
+```
+모듈을 실행하면, 아래와 같이 SyntaxError가 발생한다. 글을 읽어보면 package.json 내부에 type을 module로 설정하거나 .mjs 확장자를 사용하라고 한다. 
+3. package.json 을 생성하고 type을 module로 설정한다.
+4. module을 불러올 index.js 를 생성한다.
+```
+// ../module/index.js
+
+import { MyModules } from './Module.js';
+
+console.log(MyModules) // { define: [Function: define], get: [Function: get] }
+```
+
+하지만 이전에도 언급했듯 js코드를 해석하는 engine은 여러가지다. 즉 node.js engine이 Ecmascript의 몇 버전까지 지원하는 지에 따라 혹은 문법을 어떻게 해석하는지에 따라 사용할 수 있는 문법이 달라진다. node.js는 ES6 문법을 지원하지만 모듈에 관해서는 기본적으로 Common.js의 문법을 따르며 export 대신 exports.moduleName or module.exports를, import 대신 require를 사용한다.(export.moduleName 방식은 기존 export 객체에모듈들을 할당하는 방식(주소참조)이라면, module.exports(immutable)는 아예 새로운 메모리에 module을 할당한다.
+```
+// ../module/Module.js
+
+var  MyModules = (function Manager() {
+	var modules = {}; // 모듈 기능을 저장할 객체 생성.
+	function define(name, deps, newModule) { 
+		for (var i = 0; i < deps.length; i ++) {
+			deps[i] = modules[deps[i]];
+		}
+		modules[name] = newModule.apply(newModule, deps);
+	}
+	function get(name) {
+		return modules[name];
+	}
+	return {
+		define: define,
+		get: get
+	}
+})();
+
+exports.MyModules = MyModules;
+exports.test = test;
+```
+
+```
+// ../module/index.js
+const testModules = require('./Module')
+
+console.log(testModules) // { MyModules: { define: [Function: define], get: [Function: get] }, test: {} }
+```
 ## 6. Review
+기존에 closure를 단순히 함수를 반환하는 경우에 lexical scope가 보존되는 것으로만 알고 있었는데, closure는 scope와 연관된 js의 근본이되는 대단한 녀석이었다. lexical scope에 어떤 값이든 외부로 반환되면 closure가 적용되었다고 볼 수 있다.
+
+array, object 또한 lexical scope를 벗어났을 때 기존의 주소를 계속 참조한다.
+```
+var outValue;
+
+function test(){
+	var innerValue = ["123"];
+	outValue = innerValue;
+	outValue.push("456");
+	
+	function getInnerValue() {
+		return innerValue;
+	}
+	
+	return {
+        	getInnerValue:getInnerValue,
+    	}
+}
+testModule = test();
+testModule.getInnerValue(); // ["123", "456"];
+outValue.push("789");
+testModule.getInnerValue(); // ["123", "456", "789"];
+```
