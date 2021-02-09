@@ -1,5 +1,5 @@
 # this
-javascript를 배우기 시작하면 this가 왜 예상했던 객체를 가리키지 않는지 의문이 들 때가 온다. javascript는 특정한 규칙에 의해 this를 정의하고, 따라서 객체는 하나만의 객체를 바라보지 않는다. 가령 strict mode와 non-strict mode에서 this가 의미하는 바가 달라지기 때문에
+javascript를 배우기 시작하면 this가 왜 예상했던 객체를 가리키지 않는지 의문이 들 때가 다. javascript는 특정한 규칙에 의해 this를 정의하고, 따라서 객체는 하나만의 객체를 바라보지 않는다. 가령 strict mode와 non-strict mode에서 this가 의미하는 바가 달라지기 때문에
 this가 어떤 의미인지 헷갈리기 쉽다. 그래서 이번 시간에는 this를 완벽하게 파헤치고 정리해 보려고 한다.
 
 - 대부분의 경우 this는 함수가 어디서 누구에 의해 실행되는지에 따라 결정된다. 
