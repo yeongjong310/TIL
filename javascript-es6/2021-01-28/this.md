@@ -150,8 +150,8 @@ bar.call(undefined); [object global]
 ```
 
 ### 3.3. The bind method
-bind는 입력받은 객체를 this로 하는 새로운 function을 생성한다 그리고 그 function은 기존의 함수를 대체한다. 즉 bind는 함수가 실행될 때, this를 특정 값을 지정하기 위해 사용된다.
-bind와 (apply, call)의 차이점은 apply, call이 함수를 실행하며 this를 변경하기 때문에 일회성이지만, bind는 함수를 실행하지 않고 this가 할당된 새로운 함수를 생성하기 때문에 영구적으로 그 function을 사용할 수 있다는 이다.
+bind는 this가 입력받은 객체를 가리키는 새 function을 생성해서 반환한다. 즉 bind는 함수가 실행될 때, this를 특정한 객체로 지정하기 위해 사용한다.
+bind와 (apply, call)의 차이점은 apply, call이 함수를 실행하며 this를 변경하기 때문에 일회성이지만, bind는 함수를 실행하지 않고 this가 할당된 새로운 함수를 생성하기 때문에 영구적으로 그 function을 사용할 수 있다는 점이다.
 
 ```
 function f() {
@@ -179,7 +179,7 @@ console.log(o.a, o.f(), o.g(), o.h()); // 37, 37, 'azerty', 'azerty'
 ```
 var globalObject = this;
 var foo = (() => this);
-console.log(foo() === globalObjec); // true;
+console.log(foo() === globalObject); // true;
 ```
 bind, apply, call 을 사용해 this를 설정하면 this에 대한 설정은 무시된다. 하지만 bind, apply, call 메소드가 여전히 동작하기 때문에 첫 번째 argument만 null로 바뀌게 되며 나머지 arguments들은 그대로 함수의 parameter에 전달된다. 
 ```
@@ -199,7 +199,7 @@ console.log(obj.th === globalThis); true
 console.log(obj.bar() === globalThis); // true
 ```
 #### 3.4.3. arrow function을 method로 사용하더라도 this가 객체를 가리키는 방법
-일반 function으로 arrow function을 감싸면, function이 obj의 method가 된다. 아래 코드가 function으로 arrow functin을 감싼 예시이다.
+일반 function으로 arrow function을 감싸면, function이 obj의 method가 된다. 아래 코드가 function으로 arrow function을 감싼 예시이다.
 1. obj.bar()를 실행하면 function 내부에서 arrow function이 정의된다.
 2. 이 때 arrow function의 외부 context는 unnamed function(bar)이 되고 method로 실행되었기 때문에 this는 obj를 가리킨다. 즉 bar가 실행되는 시점에서 function 내부의 this는 obj이기 때문에 arrow function의 this도 obj가 된다. 
 ```
@@ -232,9 +232,9 @@ var obj = {
     }, 300);
   }
 }
-obj.plusOneLater(); // NaN => Dom level method에서 window는 Dom document를 포함하고 있다. dom level method도 window의 method이며 method 안에서의 this는 window를 가리킨다.
+obj.plusOneLater(); // NaN => Dom level method에서 window는 Dom document를 포함하고 있다. dom level method도 window의 method이며 method 안에서의 this는 window를 가리킨다. 일반함수는 실행시점에 this를 binding 하기 때문에 별다른 조치를 취하지 않는 경우 모든 callback은 전역을 가리킨다.
 ```
-해결방안! arrow function을 사용하자.
+해결방안! arrow function을 사용하자. => 정의되는 시점 binding
 ```
 var obj = {
   count : 10,
@@ -406,8 +406,8 @@ class Bird {
   }
 }
 
-const car = new Car();
-const bird = new Bird();
+const car = new Car(); // 원본 객체
+const bird = new Bird(); // 메소드가 복사될 객체
 
 //  method를 불러오는 object에 따라 'this'가 바뀜.
 car.sayHi(); // Hello from Ferrari
