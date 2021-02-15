@@ -160,3 +160,6 @@ foo(1000)
   .then(...)
   .catch(...)
 ```
+
+##### 참고
+[콜백 지옥](https://librewiki.net/wiki/%EC%BD%9C%EB%B0%B1_%EC%A7%80%EC%98%A5#:~:text=%EC%BD%9C%EB%B0%B1%20%EC%A7%80%EC%98%A5%EC%9D%80%20JavaScript%EB%A5%BC,%EC%A0%95%EB%8F%84%EB%A1%9C%20%EA%B9%8A%EC%96%B4%EC%A7%80%EB%8A%94%20%ED%98%84%EC%83%81%EC%9D%84%20%EB%A7%90%ED%95%9C%EB%8B%A4.)
