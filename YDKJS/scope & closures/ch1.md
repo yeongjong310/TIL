@@ -198,5 +198,7 @@ TypeError를 발생시킨다.
 JS도 실행전 컴파일을 한다는 사실을 알게 됐다. 사실 이 ch1에서 배운 내용은 스코프 뿐만아니라 호이스팅과도 연관이 있을 것 같다. 호이스팅이 어떠한 원리로 동작하는 것일까 궁금했는데, 컴파일 과정에서 변수를 모두 파악하고 그 다음 호이스팅 과정이 일어날 것이라는 감이 온다. 이후에 호이스팅 섹션에서 자세히 알아봐야겠다. 그리고 원리와 함께 새로운 지식을 접하는 것은 항상 오래 기억하게 된다. 내가 이 책을 선택한 이유도 JS의 동작과정을 조금 더 깊고 오래 알고 싶었기 때문이다. 다른 책보다 조금은 돌아가는 길일지 모르지만, 이 책을 알게되고 JS에 대해 알아갈 수록 저자에게 감사한 마음이 든다. Thank you.
 ##### 참조
 [babel&AST](https://velog.io/@logqwerty/Babel-%EC%BB%B4%ED%8C%8C%EC%9D%BC%EC%9D%84-%EC%82%B4%ED%8E%B4%EB%B3%B4%EC%9E%90)
+
 [DOM](https://vallista.kr/2019/05/07/DOM-Document-Object-Model/)
+
 [컴파일](https://hashcode.co.kr/questions/7560/javascript-%EC%9E%90%EB%B0%94%EC%8A%A4%ED%81%AC%EB%A6%BD%ED%8A%B8%EB%8A%94-%EC%BB%B4%ED%8C%8C%EC%9D%BC%EC%96%B8%EC%96%B4%EC%9D%B8%EA%B0%80%EC%9A%94-%EC%9D%B8%ED%84%B0%ED%94%84%EB%A6%AC%ED%84%B0-%EC%96%B8%EC%96%B4%EC%9D%B8%EA%B0%80%EC%9A%94)
