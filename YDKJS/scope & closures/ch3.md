@@ -84,13 +84,13 @@ function foo() {
 
 foo();
 ```
-예시가 조금 억지스럽지만, function 내부에서 i에 3을 할당하는 명령문은 (var,let,const)를 사용하지 않았기 때문에 우선 lexical scope에서 i를 찾는다. for문 내에서 i를 foo scope에 정의했기 때문에 bar 내부의 i는 foo의 i를 가리키고 i는 3을 유지하게 된다. 이렇게 for문은 10 이하인 3을 계속 유지하고 개발자의 의도와 달리 반복문은 영원히 끝이 나지 않는다.
+예시가 조금 억지스럽지만, function 내부에서 i에 3을 할당하는 명령문은 (var,let,const)를 사용하지 않았기 때문에 우선 lexical scope에서 i를 찾는다. for문 내에서 i를 foo scope에 정의했기 때문에 bar 내부의 i는 foo의 i를 가리키고 i는 3을 유지하게 된다. 이렇게 for문은 10 이하인 3을 계속 유지하고 개발자의 의도와 달리 반복문은 영원히 끝나지 않는다.
 
 function 내부의 `i = 3;`을 `var i = 3;`으로 변경하면 i는 bar scope에 저장되며 문제가 해결된다.
 
 ## 2.2.1 Global "Namespaces"
-library 같은 경우 많은 함수, 변수를 포함하고 있다. 따라서 다수의 library를 동시에 import하는 경우 의도치 않게 중복되는 identifier가
-생길 것이다. 이때 사용할 수 있는 방법은 object와 같은 다양한 값들을 global scope의 변수에 할당하는 것이다.
+library 같은 경우 많은 함수와 변수를 포함하고 있다. 따라서 다수의 library를 동시에 import하는 경우 의도치 않게 중복되는 identifier가
+생길 것이다. 이때 사용할 수 있는 방법은 함수와 변수들을 object의 속성으로 할당하고 이 object를 global scope의 변수에 할당하는 것이다.
 ```
 var MyReallyCoolLibrary = {
 	awesome: "stuff",
@@ -119,7 +119,7 @@ foo(); // <-- and this
 
 console.log( a ); // 2
 ```
-위와 같이 함수를 선언하는 방식으로 말이다. 함수를 선언한 후에 실행하는 가장 큰 이유는 선언한 함수를 재사용하기 위해서다. 하지만 재사용 할 필요가 없다면, global에 선언된 foo는 scope 영역을 교란시킬 뿐이다. 이를 해결하기 위한 아주 좋은 방법이 있다.
+위와 같이 함수를 선언하는 방식으로 말이다. 함수를 선언하고 실행하는 가장 큰 이유는 선언한 함수를 재사용하기 위해서다. 하지만 재사용 할 필요가 없다면, global에 선언된 foo는 scope 영역을 교란시킬 뿐이다. 이 문제를 해결할 아주 좋은 방법이 있다.
 
 ```
 var a = 2;
@@ -143,11 +143,11 @@ console.log( a ); // 2
 ```
 var a = function b() {}
 ```
-일반적인 함수 표현식을 보면 function의 이름은 `b` 이지만 scope에 등록되는 identifier는 `a`이다.
+일반적인 함수 표현식을 보면 function의 이름은 `b` 이지만 scope에 등록되는 identifier는 `a`다.
 
 ## 3.1. Anonymous vs. Named
 함수 표현식은 이름없이 사용할 수 있고, 함수 선언문은 불가능하다. 그리고 이름없는(Anonymous) 함수는 일반적으로 이름있는 함수보다 빠르고
-작성하기도 쉽다. 하지만 이름없는 함수를 사용하기전에 몇 가지는 고려해야 필요가 있다.
+작성하기도 쉽다. 하지만 이름없는 함수를 사용하기 전에 몇 가지 주의해야할 사항이 있다.
 
 1. Anonymous functions는 이름이 없다. 따라서 디버깅 때 어디서 오류가 났는지 확인하기 힘들다.
 2. 이름이 없기 때문에 재귀함수와 같이 function 내부에서 자신을 부르는 구조로 사용하기 힘들어진다. 이름 없는 함수를 재귀로 사용하려면
@@ -227,11 +227,11 @@ var a = 2;
 
 });
 ```
-위와 같이 callback으로 사용할 수도 있다.
+일반적인 callback 함수를 넣어줄 수도 있다.
 
 # 4. Blocks As Scopes
 
-Function 단위로만 스코프를 지정하는 것 보다 더 세부적으로 변수의 사용범위를 제한할 수 없을까? 
+Function 단위로만 스코프를 지정하는 것보다 더 세부적으로 변수의 사용범위를 제한할 수 없을까? 
 ```
 for (var i = 0; i < 10; i ++) {
     console.log( i );
@@ -243,7 +243,7 @@ i는 for문 내에서만 사용하려고 했지만 의도와는 다르게 global
 이때 우리는 block 단위로 scope를 지정할 수 있다. block scope란 {} 중괄호를 감싸는 블록이 하나의 scope가 되어 변수범위를 제한하는 것이다.
 
 ## 4.1. `with`
-이전 ch2에서 배웠던 `with`를 다시 생각해보자. `with`는 새로운 scope를 생성한다. 그리고 with 내의 변수들은 lexical scope가 적용된다. 따라서 `b = 3`의 경우 스코프 내에 b가 없기 때문에 선언한 변수는 외부 scope로 빠져나가 버린다. 즉 입력된 test scope와 별개로 새로운 block scope가 생성.
+이전 ch2에서 배웠던 `with`를 다시 생각해보자. `with`는 새로운 scope를 생성한다. 그리고 `with` 내의 변수들은 lexical scope가 적용된다. 따라서 `b = 3`의 경우 스코프 내에 b가 없기 때문에 선언한 변수는 외부 scope로 빠져나가 버린다. 즉 입력된 test scope와 별개로 새로운 block scope를 생성한다.(let, var는 적용되지 않는다.)
 ```
 var test = { a: 1 }
 with(test){
