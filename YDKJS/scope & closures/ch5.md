@@ -120,17 +120,18 @@ callback으로 넘겨주고 내부적으로 그 함수를 실행한다면, closu
 ```
 for (var i = 1; i <= 5; i ++) {
   setTimeout( function timer() {
-    console.loog( i );
+    console.log( i );
     }, i*1000 );
 }
 ```
 closure를 설명할 때 반복문은 매우 유용하게 쓰인다. 위 코드를 실행하면 의도한 바와 달리 6이 5번 출력된다.
-그 이유는 closure에 의해 timer는 lexical scope 외 영인익 setTimeout 내부에서 실행된다. 그리고 모든 i 가 global 영역의 i를 가리키고 있다.
-따라서 for문이 끝난 시점에서 globla 영역이 i는 6가 되어 6가 5번 출력되는 것이다.
+그 이유는 반복문이 모두 동작한 후에 closure가 적용되며 timer은 lexical scope 외부인 setTimeout 내부에서 실행된다. 이때는 모든 i 가 global 영역의 i인 6을 가리킨다.
+따라서 for문이 끝난 시점에서 globla 영역의 i는 이미 6이기 때문에 6이 5번 출력되는 것이다.
 
 **note:** setTimeout은 for문이 끝나면 실행되기 때문에 setTimeout(..., 0)일지라도 6이 5번 출력된다.
 
-그렇다면 아래 코드는 어떨까?
+이 문제를 해결하기 위해 배웠던 closure를 응용해보자. 
+우선 i가 global을 가리키지 않고 별개의 scope 내에 존재해야 한다. 아래처럼 IIFE로 함수를 실행시켜 스코프를 생성할 수 있다.
 ```
 for (var i = 1; i <= 5; i ++) {
   (function(){
@@ -140,21 +141,20 @@ for (var i = 1; i <= 5; i ++) {
   })();
 }
 ```
-IIFE는 새로운 scope를 생성한다. 하지만 이 scope에서도 i는 존재하지 않고, 외부 영역인 global에서 i를 호출하기 때문에 역시 6이 5번 출력되는
-같은 결과를 낳는다.
+IIFE는 새로운 scope를 생성한다.(함수가 실행되기 때문에) 하지만 이 scope에서도 i는 존재하지 않고, 외부 영역인 global에서 i를 호출하기 때문에 역시 6이 5번 출력되는 같은 결과를 낳는다.
 
 ```
 for (var i = 1; i <= 5; i ++) {
   (function(j){
     setTimeout( function timer() {
-      console.log( j );
+      console.log( j ); // setTimeout에서 timer가 실행됭 때 j는 closure의 법칙에 따라 지역변수 j를 호출한다.
     }, i * 1000 );
   })(i);
 }
 
 for (let i = 1; i <= 5; i ++) {
     setTimeout( function timer() {
-      console.log( i );
+      console.log( i ); // 이것도 closure다. block scope 범위 외부에서 timer가 실행되었을 때도 i는 해당 지역변수 i를 호출한다.
     }, i * 1000 );
 }
 ```
@@ -162,7 +162,7 @@ for (let i = 1; i <= 5; i ++) {
 따라서 위와 같이 매 반복문이 실행될 때 마다, scope가 형성되고 그 내부에서 i는 따로 선언되어야 한다.
 
 ## 5. Modules
-callback외에 closure를 열심히 사용하는 또다른 모델이 있다. 바로  module이다.
+callback 외에 closure를 열심히 사용하는 또 다른 모델이 있다. 바로 module이다.
 ```
 function CoolModule() {
 	var something = "cool";
@@ -188,19 +188,17 @@ foo.doSomething(); // cool
 foo.doAnother(); // 1 ! 2 ! 3
 ```
 위 코드가 바로 우리가 부르는 module의 실체다. inner functions를 메소드로 구성한 object를 반환한다. 그리고 outer function을 실행하면
-module instance가 생성되어 foo 변수에서 그 객체의 주소를 참조한다. 여기서 부터 closure가 적용된다. 이미 outer function은 종료되었기 때문에 
-반환한 object를 더 이상 참조할 수 없어야 하지만 closure 덕분에 참조할 수 있다. 그리고 이 object의 메소드를 통해 
+module instance가 생성되어 foo 변수에서 그 객체의 주소를 참조한다. 여기서 부터 closure가 적용된다. 이미 outer function은 종료되었기 때문에 반환한 object를 더 이상 참조할 수 없어야 하지만 closure 덕분에 참조할 수 있다. 그리고 이 object의 메소드를 통해 
 foo에 저장된 CoolModule instance에 접근하는 것도 closure다.
 
 여기까지 module이 실행되기 위한 조건을 살펴보면 다음과 같다.
 
-1. outer function이 inner function을 감싸고 있어야한다. 그리고 outer function이 한번 이상은 실행되어야 한다.
+1. outer function이 inner function을 감싸고 있어야한다. 그리고 outer function이 한 번 이상은 실행되어야 한다.
 2. outer function은 최소 하나 이상의 inner function을 반환해야한다. 
-3. 반환된 inner functiond은 closure 덕분에 lexical scope 범위 밖이지만 lexical scope 범위의 변수 혹은 함수에 접근할 수 있다.
+3. 반환된 inner function은 closure 덕분에 lexical scope 범위 밖이지만 lexical scope 범위의 변수 혹은 함수에 접근할 수 있다.
 
-
-하지만 이렇게 작성된 module은 global에 노출되어 한 프로그램에서 여러번 실행할 수 있기 때문에 
-누군가 한번더 실행하면 각 module 마다 고유의 scope를 가지게 된다. 
+하지만 이렇게 작성된 module은 global에 노출되어 한 프로그램에서 여러번 실행될 수 있기 때문에 
+누군가 한번 더 실행하면 각 module 마다 고유의 scope를 가지게 된다. 
 
 이때 IIFE를 사용하면 module을 생성하는 함수는 global에 노출되지 않는다.
 ```
@@ -417,7 +415,7 @@ const testModules = require('./Module')
 console.log(testModules) // { MyModules: { define: [Function: define], get: [Function: get] }, test: {} }
 ```
 ## 6. Review
-기존에 closure를 단순히 함수를 반환하는 경우에 lexical scope가 보존되는 것으로만 알고 있었는데, closure는 scope와 연관된 js의 근본이되는 대단한 녀석이었다. lexical scope에 어떤 값이든 외부로 반환되면 closure가 적용되었다고 볼 수 있다.
+기존에 closure는 단순히 함수를 반환하는 경우에 lexical scope가 보존되는 것으로만 알고 있었는다. 하지만 closure는 scope와 연관된 js의 근본이되는 대단한 녀석이었다. lexical scope에 어떤 값이든 외부로 반환되면 closure가 적용되었다고 볼 수 있다.
 
 array, object 또한 lexical scope를 벗어났을 때 기존의 주소를 계속 참조한다.
 ```
