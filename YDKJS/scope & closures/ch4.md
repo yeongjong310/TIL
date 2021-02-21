@@ -2,7 +2,7 @@
 
 ## 1. Chicken Or The Egg?
 
-보통 Code는 line에 따라 위에서 아래로 실행된다. 하지만 이전에 배웠던 것처럼 Js는 실행전 compiling을 한다. 
+보통 Code는 line에 따라 위에서 아래로 실행된다. 하지만 이전에 배웠던 것처럼 Js는 실행 전에 compiling을 한다. 
 lexir는 lexical scope를 생성하기 위해 모든 선언들을 미리 파악하는데, 이렇게 선언된 식별자를 미리 파악하는 과정때문에 일부 실행순서가 바뀌게 된다.
 
 다음 1번 예시 코드를 보자.
@@ -16,7 +16,7 @@ var a;
 console.log( a );
 ```
 
-console.log( a );는 어떤 값을 출력할까? 다른 언어에 익숙한 개발자라면
+console.log( a );는 어떤 값을 출력할까? 다른 언어를 사용해 봤다면
 
 1. `a = 2` : a에 2를 할당
 2. `var a;` : a를 다시 선언 및 undefined로 초기화
@@ -70,7 +70,7 @@ a = 2;
 **Note:** 오직 선언부만이 hoisting된다. 할당 및 실행부는 그 자리에서 그대로 실행된다.
 
 ### 2.1. per-scope
-한 가지 꼭 집고 넘어가야할 중요한 사실은, scope 단위로 hoisting이 일어난 다는 사실이다. 변수 a는 foo의 맨 윗줄로 hoisting 되었다.
+한 가지 꼭 짚고 넘어가야 할 중요한 사실은, scope 단위로 hoisting이 일어난다는 점이다. 변수 a는 foo의 맨 윗줄로 hoisting 되었다.
 ```
 foo();
 
@@ -84,7 +84,7 @@ console.log( a ); // a is not defined
 
 ### 2.2 only function declaration. 
 함수를 정의하는 방법으로 크게 선언문, 표현식이 있다.
-두 방법은에 따라 hoisting 결과가 달라지는데 아래 예시를 통해 살펴보자.
+두 방법에 따라 hoisting 결과가 달라지는데 아래 예시를 통해 살펴보자.
 ```
 foo(); // TypeError
 bar(); // ReferenceError
@@ -94,14 +94,6 @@ var foo = function bar() {
 };
 ```
 함수 표현식의 경우 변수 foo가 hoisting 된다. foo는 undefined이기 때문에 foo를 실행하면 TypeError가 발생한다.
-```
-var foo;
-
-foo(); // TypeError
-bar(); // ReferenceError
-
-function bar() {};
-```
 또한 함수 표현식의 경우 compile 과정에서 function의 이름을 따로 파악하지 않기 때문에 ReferenceError가 발생하게 된다.
 ```
 var foo;
@@ -176,9 +168,8 @@ function foo() {
 ```
 
 일반 블록 내에 함수를 선언하는 경우..? 어떻게 될까? Js 버전에 따라 변하는 듯 하다.
-우선 구글 88.0.4324.146 버전에서 실험해본 결과 type에러가 발생했다.
-즉 foo가 if block의 첫번째 줄에서 `var foo`를 선언하고 lexical scope가 적용되어 global에 선언되었거나, 단순히 block scope가
-적용되지 않았거나 여러가지 경우로 추측해 볼 수 있다. 결론적으로 블록 내에서 function을 선언하는 것은 좋지 않다.
+우선 구글 88.0.4324.146 버전에서 실험해본 결과 type에러가 발생했다. Refference Error가 아닌 것으로 보아 foo라는 변수가 global로
+호이스팅되었다. 함수 선언문은 보통 함수 전체가 호이스팅 되는데 이상한 일이다. 결론적으로 블록 내에서 function을 선언하는 것은 좋지 않다.
 ```
 foo(); // Uncaught TypeError: foo is not a function
 
