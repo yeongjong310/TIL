@@ -2,9 +2,9 @@ ch3. Function vs Block scope
 
 
 # 1. Scope From Functions
-js 는 기본적으로 Function에 의해 scope가 생성된다.
+js 는 기본적으로 Functiona 마다 scope를 생성한다.
 
-scope 덕분에 서로의 영역을 침범하지 않는 고유의 식별자를 가지고 있을 수 있다.
+scope 덕분에 각 영역은 서로의 영역을 침범하지 않는 고유의 식별자를 가지고 있을 수 있다.
 
 예를들어 아래 코드는 2개의 function이 있기 때문에 global을 포함한 총 3개의 scope 영역이 있다고 생각하면 된다.
 ```
@@ -45,9 +45,9 @@ var b;
 doSomething( 2 ); // 15
 ```
 
-위 코드를 보면 b와 doSomethingElse는 어디서든 사용할 수 있다.
-하지만 실질적으로 b와 doSomethingElse는 doSomething에서만 사용하고 있기 때문에, 굳이 global 영역까지 침범할 필요가 없다.
-추후에 어떤 일이 발생할지 모르기 때문에 필요한 곳에서만 변수를 사용할 수 있게 제한하는 것은 매우 중요하다.
+위 코드를 보면 b와 doSomethingElse는 global에 정의되었고 어디서든 접근할 수 있다.
+하지만 b와 doSomethingElse는 doSomething에서만 접근하고 있기 때문에, 굳이 global 영역에 정의해서 모든 scope에 영향을 미치는 것은 낭비다.
+추후에 어떤 일이 발생할지 모르기 때문에 필요한 곳에서만 변수를 사용할 수 있도록 변수의 접근을 제한하는 것은 매우 중요하다.
 
 ```
 function doSomething(a) {
