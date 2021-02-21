@@ -9,7 +9,7 @@ Scope는 동작하는 방법에 따라 2가지로 나뉜다.
 
 ## 1. Lex-time
 이전 챕터에서 잠깐 살펴본 바와 같이 lexing process는 나눠진 token에 의미를 부여한다.
-사실상 lexical scope는 개발자가 코드를 작성할 동안, function과 blocks를 어떻게 작성했고, valuable을 어디서 사용했는지에 따라 정의된다. 그리고 실제로 프로그램이 실행될 때의 scope는 개발자가 작성한 코드를 lexer가 해석해고 lexical scope 확정한다. 이로인해 프로그램이 실행되면 engine은 이미 정의된 scope 내에서 원하는  빠르게 찾을 수 있다.
+사실상 lexical scope는 개발자가 코드를 작성할 동안, function과 blocks를 어떻게 작성했고, valuable을 어디서 사용했는지에 따라 정의된다. 그리고 컴파일 타임동안 lexer는 작성된 코드를 분석하여 lexical scope가 형성한다. 나중에 프로그램이 실행될 때는 engine이 이미 정의된 scope 내에서 원하는 변수를 찾기 때문에 비교적 빠르고 효율성이 높다.
 
 ### 1.1. Look-ups
 `foo.bar.baz` 와 같이 객체를 통해 프로펄티를 불러오는 경우에는 맨 앞의 식별자만 look up한다.
@@ -94,13 +94,10 @@ o1은 a를 가지고 있지만, o2는 가지고 있지 않다. with는 입력받
 **note:** with 내부가 lexical scope로 여겨지기 때문에 이 내부에서 var 혹은 let을 선언하면 그 블록 내에 변수가 할당되어야 한다.
 하지만 with 내에서 생성된 변수는 해당 scope에 정의되지 않고, 외부 lexical scope로 이동한다.
 ```
-function foo(obj) {
-	with (obj) {
-		var a = 2;
-	}
-  console.log(a);
+with("test") {
+	var a = 4;
 }
-foo({}) // 2;
+console.log(a); // 4
 ```
 
 ### 2.3. Performance
