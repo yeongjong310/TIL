@@ -34,11 +34,11 @@ var a = 2;
 bar();
 ```
 
-그 이유는 foo를 실행한 곳이 bar 내부이기 때문이다. this를 살펴보자. use string의 경우 기본적으로 this는 undefined이다.
+그 이유는 bar의 내부에서 foo를 실행하기 때문이다. this를 살펴보자. 엄격모드에서는 기본적으로 this는 undefined이다.
 그래서 f2()를 실행하면 undefined를 출력한다. 하지만 window 객체를 통해 접근하면 this가 window를 가리킨다.
 ```
 function f2() {
-    'use string';
+    'use strict';
     return this;
 }
 
