@@ -101,7 +101,6 @@ setTimeout( function() {
 ```
 익명함수의 경우 arguments.callee를 사용해야 자신을 불러올 수 있다. 하지만 이 방법은 권장되지 않는다. 따라서 웬만해서 재귀함수를 사용해야할 때
 named function을 사용하자.
-```
 
 #### 2.1.2. 1번 this의 call apply bind
 ```
