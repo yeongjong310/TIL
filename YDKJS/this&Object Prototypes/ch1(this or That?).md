@@ -47,7 +47,7 @@ speak( me ); // Hello, I'm KYLE
 
 ## 2. Confusions + misconception
 
-1. itself
+- 1. itself  
 this는 실행되고 있는 function 자신을 가리키는 키워드가 아니다.
 ```
 function foo(num) {
@@ -117,7 +117,7 @@ for (let i=0; i<10; i++) {
 console.log( foo.count ) // 4
 ```
 
-2. Its Scope
+- 2. Its Scope
 this는 함수의 lexical scope를 가리킨다. 이말은 거짓이다. this가 특정 함수의 scope를 가리키는 것은 맞다. 하지만
 this는 함수가 누구에 의해 실행됐는지 혹은 함수가 실행된 곳이 어딘지에 따라 가리키는 scope가 달라진다.
 
