@@ -47,8 +47,18 @@ console.log(laptop2.ram); //16
 
 ![이후 추가](https://user-images.githubusercontent.com/39623897/103169504-87200080-487f-11eb-8552-e6db35d449df.JPG)
 
+### 2.1. 함수 구조 살펴보기
+![image](https://user-images.githubusercontent.com/39623897/108944888-fb6bfa00-769e-11eb-869b-c87cf9eb2a84.png)
+
+위 그림을 보면 f Laptop() 함수의 속성에는 prototype과 __proto__가 있는 반면, Laptop 객체에는 오로지 __proto__만이 존재한다.
+f Laptop()의 prototype은 객체의 __proto__와 연결된다. 즉 Laptop 함수도 하나의 객체이고 prototype 속성 또한 객체인데 f Laptop() 함수가 만드는 모든 객체가 이 prototype을 공유하게 된다. Laptop()함수에 있는 또 다른 __proto__는 f () 함수 객체로 부터 이 f Laptop() 함수가 생성되었다는 의미이며 f () 함수의 prototype을 가리키게 된다.
+
+즉 __proto__는 객체가 어떤 생성자로부터 상속받은 값들이며,
+prototype은 상속할 값들이다.
+
 ## 3. prototype chain
 이렇게 __proto__ 속성을 통해 상위 prototype object와 연결되어있는 형태를 prototype chain 이라고 하며, 상위 속성을 타고가다가 결국 prototype이 null을 가지는 function Object()의 prototype object에서 끝이난다. 따라서 모든 객체는 object의 속성을 사용할 수 있다.
+
 ![image](https://user-images.githubusercontent.com/39623897/103170658-331a1980-4889-11eb-8f0f-3bc7ee6d9493.png)
 
 ## 4. class 기반 vs prototype 기반
