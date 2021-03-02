@@ -35,7 +35,9 @@ baz(); // <-- 1. call-site for `baz` in `global`
 이제 본격적으로 this가 바인딩되는 규칙을 알아보자. + (call site와의 연관성)
 
 ### 2.1. Default Binding
-함수가 딸랑 그대로 실행되는 경우가 Default 규칙이다. 만약 어떠한 다른 규칙도 적용되지 않았다면 항상 Default가 적용된다고 생각하자.
+우선 call-site 개념을 잠깐 지워버리자. 그리고
+함수가 딸랑 그대로 실행되는 경우에 this는 global을 가리키는데 이게 Default 규칙이다. 
+만약 어떠한 다른 규칙도 적용되지 않았다면 항상 Default가 적용된다고 생각하자.
 ```
 function foo() {
 	console.log( this.a );
