@@ -483,23 +483,52 @@ if (!Function.prototype.bind) (function(){
 
     var baseArgs= ArrayPrototypeSlice.call(arguments, 1), // arguments 들
         baseArgsLength = baseArgs.length, // arguments 길이
-        fToBind = this, // bind를 부른 함수
+        fToBind = this, // bind를 부른 함수 // 바인드 될 함수
         fNOP    = function() {}, 
+        // bind에 의해 반환될 함수
         fBound  = function() {
           baseArgs.length = baseArgsLength; // reset to default base arguments
-          baseArgs.push.apply(baseArgs, arguments);
+          baseArgs.push.apply(baseArgs, arguments); // concat baseArgs(bind하며 받는 args), arguments(bind 이후 받는 args)
+          console.log(this)
           return fToBind.apply(
+                 // 0. fNOP는 이미 bind를 호출한 함수의 prototype을 가지고 있다. fBound의 prototype은 fNOP의 객체이다.
+                 // 1. this는 fBound를 호출하는 context를 가리킨다.(bind된 함수가 불려질 때) ex) b = a.bind(), b() 에서 b()부분
+                 // => 따라서 fNOP과 this는 별개이며 this는 일반적으로 window를 가리킨다.
+                 // 2. new가 사용된다면(ex. new(bind()) ), this는 fBound의 생성자가 만들어 내는 object를 가리킨다.
+                 // => fNOP(bind된 함수)는 this(new fBound) 이다.
                  fNOP.prototype.isPrototypeOf(this) ? this : otherThis, baseArgs
           );
         };
+        console.log(new fBound)
 
-    if (this.prototype) {
+    if (this.prototype) { // 함수는 prototype을 가지고 있다. => fNOP가 함수의 prototype을 가진다. => fNOP의 생성자가 함수의 생성자가 된다.
       // Function.prototype doesn't have a prototype property
       fNOP.prototype = this.prototype;
     }
+    
     fBound.prototype = new fNOP();
 
     return fBound;
   };
 })();
+
+function test(){};
+test1 = test.bind({"a":1});
+new test1("123");
+
 ```
+**정리:**
+1. bind 함수가 호출되면.
+1-1. 코드의 마지막 부분에 `fNOP.prototype = this.prototype`를 보면 this(test)의 prototype을 fNOP의 prototype에 할당한다.
+1-2. 그 아래로 `fBound.prototype = new fNOP();`에서 fBound의 prototype은 fNOP(test)에 의해 생성되는 object와 같다.
+
+2. bind 함수가 반환한 fBound 함수가 호출되면.  
+2-1. 일반적인 호출의 경우 this는 window를 가리킨다. 따라서 fNOP(test)에 의해 생성된 객체가 아니기 때문에 otherThis를 apply함수의 argument로 넘겨준다.  
+2-2. `fNOP.prototype.isPrototypeOf(this)`를 보자. new를 통해 fBound가 호출되면 this는 생성될 객체를 바라본다. 
+
+생성될 객체는 fBound의 prototype = new fNOP() 에 의해 결정되기 때문에 new fNOP() 를 부모로 두는 객체가 생성된다.
+
+![image](https://user-images.githubusercontent.com/39623897/109634785-fde1be80-7b8c-11eb-9817-f6a43a7e183c.png)
+
+따라서 fNOP = test이고, this는 new fNOP = new test 이기 때문에 true를 반환한다. 결과적으로 apply(this, baseArgs)를 반환하는데 this가 new test이기 때문에 test가 binding된 함수가 된다.
+
