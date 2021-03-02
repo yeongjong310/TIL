@@ -53,8 +53,16 @@ foo();
 // 2 <- this.a in foo
 // 2 <- this.a in bar
 ```
-foo()와 bar()은 call-site가 다르다. 하지만 두 함수는 딸랑 혼자서 실행되고 있기 때문에(unlike obj.bar()) 내부의 this는 모두 global을 바라본다.
-위  바로 default 규칙에 의해 this가 global context에 바인딩되는 사례이다.
+foo()와 bar()은 call-site가 다를까? 위에서 살펴본 바로는 다르게 인식할 수 있다. 하지만 this를 생각할 때는 조금 다른 시선으로 call-site를 조사해야한다.
+그게 바로 foo()와 bar() 모두 global context에서 실행됐다는 점이다.
+두 함수가 딸랑 혼자서 실행되고 있는데(unlike obj.bar()) 이는 모두 global에서 불러온 함수들이다.
+```
+global = {
+	foo: foo,
+	bar: bar,
+	}
+```
+즉 위와 같은 구조를 통해 foo와 bar가 실제적으로 global scope 내에서 실행되고 이것이 call-site이며, this를 결정짓게 된다.
 
 **note:** 하지만 `strick mode`에서는 this가 global을 자동으로 binding 하지 않는다. 
 
@@ -85,7 +93,7 @@ var a = 2;
 ```
 
 ### 2.2. Implicit Binding
-다음 규칙은 함수가 object의 context로써 불려지는가를 고려해야한다.
+Implicit Binding 규칙은 함수가 global 외에 다른 object의 context에서 불려지는가를 고려한 규칙이다.
 예를 들어 `obj.foo()`가 그러하다.
 ```
 function foo() {
@@ -128,7 +136,8 @@ localValue();
 **note:**
 하지만 Event Handler와 같이 callback 함수를 DOM으로 강제 binding하는 함수들이 있다.
 이때는 this를 개발자의 의도대로 설정하는 것이 매우 힘들다.
-아래 예제는 모두 자기자신 element를 참조한다. 2,3번은 bind를 통해 window로 변경할 수 있다.
+아래 예제는 모두 자기자신 element를 참조한다. 2, 3번은 bind를 통해 window로 변경할 수 있다.
+
 1. direct
 ```
 <button onlick="console.log(this)"> Show this </button>  <!-- <button onclick="..."></button> -->
