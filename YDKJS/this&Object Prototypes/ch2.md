@@ -532,3 +532,5 @@ new test1("123");
 
 따라서 fNOP = test이고, this는 new fNOP = new test 이기 때문에 true를 반환한다. 결과적으로 apply(this, baseArgs)를 반환하는데 this가 new test이기 때문에 test가 binding된 함수가 된다.
 
+과제:
+-나중에 다시 정리...-
