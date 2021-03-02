@@ -53,12 +53,11 @@ foo();
 // 2 <- this.a in foo
 // 2 <- this.a in bar
 ```
-foo()가 혼자서 실행됐을 때 foo 내부의 this는 global을 바라본다. 
-또한 foo 내부에서 실행된 bar의 경우도 this는 global을 바라보고있다.
+foo()와 bar()은 call-site가 다르다. 하지만 두 함수는 딸랑 혼자서 실행되고 있기 때문에(unlike obj.bar()) 내부의 this는 모두 global을 바라본다.
 
-**note:** `this`는 call-site에 의해 바인딩되는 규칙을 가지고 있지다. 하지만 Default 규칙이 적용됐을 때는 call-site와 상관없이 언제나 global을 바라본다.(bar)
 
-하지만 `strick mode`에서는 this가 global을 자동으로 binding 하지 않는다. 
+**note:** 하지만 `strick mode`에서는 this가 global을 자동으로 binding 하지 않는다. 
+
 ```
 function foo() {
 	"use strict";
