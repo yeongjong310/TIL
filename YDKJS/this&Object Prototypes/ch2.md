@@ -10,7 +10,7 @@ function baz() {
     // so, our call-site is in the `global` scope
 
     console.log( "baz" );
-    3. bar(); // <-- call-site for `bar` in `baz`
+    bar(); // <-- 3. call-site for `bar` in `baz`
 }
 
 function bar() {
