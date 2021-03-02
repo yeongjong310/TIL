@@ -467,7 +467,7 @@ var args = slice.call(arguments, 1);
 ```
 var funcArgs = args.concat(slice.call(arguments))
 ```
-4. 1번의 함수가 bind된 새로운 함수다. 이 함수가 실행되는 순간 먼저 apply함수가 실행되며 new와 함께 사용했을 때는 새로운 함수 내부에 this가 존재하지 않기 때문에 '{}' 빈 객체를 반환한다.
+4. 1번의 함수가 bind된 새로운 함수다. 이 함수가 실행되는 순간 먼저 apply함수가 실행되며 new와 함께 사용했을 때는 새로운 함수 내부에 this가 존재하지 않기 때문에 '{}' 빈 객체를 반환해야 하지만, 코드의 윗부분을 살펴보면 new와 함께 실행되는 순간 bind 함수 내부에 this가 새로 생성될 object를 가리킬 것이기 때문에 function이 아닌 관계로 에러를 발생시킨다.
 
 #### 3.1.2. 2번 `new` works after bind
 ```
