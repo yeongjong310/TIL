@@ -54,7 +54,7 @@ foo();
 // 2 <- this.a in bar
 ```
 foo()와 bar()은 call-site가 다르다. 하지만 두 함수는 딸랑 혼자서 실행되고 있기 때문에(unlike obj.bar()) 내부의 this는 모두 global을 바라본다.
-
+위  바로 default 규칙에 의해 this가 global context에 바인딩되는 사례이다.
 
 **note:** 하지만 `strick mode`에서는 this가 global을 자동으로 binding 하지 않는다. 
 
