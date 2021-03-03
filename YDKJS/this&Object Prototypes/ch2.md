@@ -534,3 +534,184 @@ new test1("123");
 
 과제:
 -나중에 다시 정리...-
+
+**왜 new가 bind를 overriding 할 수 있어야 할까?**
+bind의 argument는 기존 함수의 매개변수를 앞에서 부터 차례대로 고정시킨다.
+```
+function foo(p1,p2) {
+	this.val = p1 + p2;
+}
+
+// using `null` here because we don't care about
+// the `this` hard-binding in this scenario, and
+// it will be overridden by the `new` call anyway!
+var bar = foo.bind( null, "p1" );
+
+var baz = new bar( "p2" );
+
+baz.val; // p1p2
+```
+따라서 고정된 매개변수가 있다면 bind를 사용하면 편리하다.
+
+## 4. Binding Exceptions
+
+### 4.1. Ignored `this`
+null 혹은 undefined가 call, bind, apply 메소드의 argument로 넘어오면 default 룰이 적용된다.
+```
+function foo(a,b) {
+	console.log( "a:" + a + ", b:" + b );
+}
+
+// spreading out array as parameters
+foo.apply( null, [2, 3] ); // a:2, b:3
+
+// currying with `bind(..)`
+var bar = foo.bind( null, 2 );
+bar( 3 ); // a:2, b:3
+```
+
+null과 undefined를 의도적으로 입력하면, argument를 preset 할 수 있다.
+```
+function foo(a,b) {
+	console.log( "a:" + a + ", b:" + b );
+}
+
+// spreading out array as parameters
+foo.apply( null, [2, 3] ); // a:2, b:3
+
+// currying with `bind(..)`
+var bar = foo.bind( null, 2 );
+bar( 3 ); // a:2, b:3
+```
+
+### 4.2. Indirection
+
+this를 사용한 함수는 실행되는 context에 따라 가리키는 대상이 변하기 때문에, implicit binding을 이용하면 필요에 따라 가리키는 대상을 변경할 수 있다.
+
+```
+function foo() {
+	console.log( this.a );
+}
+
+var a = 2;
+var o = { a: 3, foo: foo };
+var p = { a: 4 };
+
+o.foo(); // 3
+(p.foo = o.foo)(); // 2 <- p.foo = o.foo를 수행하면 foo를 반환하기 때문에 일반 global 객체의 a인 2를 반환
+```
+
+Reminder: strict 모드에서의 default 규칙은 언제나 undefined임을 명심하자.
+
+### 4.3. Softening Binding
+default 의 this가 global을 가리키지 않고 다른 context를 가리키게 할 수 있는 방법이 있다.
+이 방법은 explicit, implicit binding도 모두 적용되기 때문에 bind함수와 차별되는 방법이다.
+위에서 살펴본 [`new` doesn't work after bind](#311-1번-new-doesnt-work-after-bind)의 방법과 비슷하다.
+
+3.1.1 번에서 bind함수는 apply메소드를 사용하고 있는데, softbind 함수의 경우 this가 어떤 값인지에 따라 apply에 입력해줄 obj를 변경하기만 하면 된다.
+
+따라서 일반 bind 함수는 1번 사용되면 더이상 this를 변경하지 못하지만, 아래 함수는 변경 가능하다.
+
+```
+// func.softBind(obj) 라면 this는 func를 가리키고 obj는 입력된 obj를 가리킨다.
+// 1. this가 false이거나(!this), 2. window(global)이 "undefined" 가 아닌 경우에 this가 window(global)을 가리키면
+// obj를 apply의 argument로 입력. 즉 1번 경우거나 2번은 default 바인딩 인경우에만 입력받은 obj가 바인딩됨 => 함수가 혼자서 실행되는 경우
+// 위의 경우가 아니라면 `ex) obj.test();` this(obj)가 apply의 argument로 입력된다. => implicit binding 
+if (!Function.prototype.softBind) {
+	Function.prototype.softBind = function(obj) {
+		var fn = this,
+			curried = [].slice.call( arguments, 1 ),
+			bound = function bound() {
+				return fn.apply(
+					(!this ||
+						(typeof window !== "undefined" && // window가 undefined가 아니어야함
+							this === window) || // this === 가 window 이면(default binding)
+						(typeof global !== "undefined" &&
+							this === global)
+					) ? obj : this,
+					curried.concat.apply( curried, arguments )
+				);
+			};
+		bound.prototype = Object.create( fn.prototype );
+		return bound;
+	};
+}
+```
+
+**핵심 코드**:
+1. this가 window 인 경우는, softbind 함수가 실행되고 반환된 함수가 독자적으로 실행되었을 때이다. 이때는 입력받은 obj가 binding 된다.
+2. 1번이 아닌경우는 obj의 메소드로 실행되는 경우이며 이때는 this(실행한 obj)가 binding 된다.
+```
+(
+	(typeof window !== "undefined" && 
+		this === window) ||
+	(typeof global !== "undefined" &&
+		this === global)
+) ? obj : this,
+```
+
+## 5. Lexical `this`
+arrow 함수의 경우 this를 사용하는 함수가 정의된 시점에 위치한 context의 this를 따른다.
+this가 정의되는 시점은 foo가 실행될 때 이다.
+따라서 아래 `bar = foo.call( obj1 );` 코드에서 이미 foo의 this는 obj1로 결정되었다.
+```
+function foo() {
+	// return an arrow function
+	return (a) => {
+		// `this` here is lexically adopted from `foo()`
+		console.log( this.a );
+	};
+}
+
+var obj1 = {
+	a: 2
+};
+
+var obj2 = {
+	a: 3
+};
+
+var bar = foo.call( obj1 );
+bar.call( obj2 ); // 2, not 3!
+```
+
+### 5.1. 사용처
+
+#### 5.1.1. 콜백 메소드
+
+**arrow functions**
+```
+function foo() {
+	setTimeout(() => {
+		// `this` here is lexically adopted from `foo()`
+		console.log( this.a );
+	},100);
+}
+
+var obj = {
+	a: 2
+};
+
+foo.call( obj ); // 2
+```
+foo가 실행되는 시점에 this를 obj로 고정하면(foo.call( obj )) setTimeout 메소드 내부에서 this는 변동되지 않는다.
+
+**normal functions**
+```
+function foo() {
+	var self = this; // lexical capture of `this`
+	setTimeout( function(){
+		console.log( self.a );
+	}, 100 );
+}
+
+var obj = {
+	a: 2
+};
+
+foo.call( obj ); // 2
+```
+self에 this를 저장해 두고 setTimeout에 self를 넘겨주면 self가 closure에 의해 정상적으로 this를 가리킨다.
+
+
+
