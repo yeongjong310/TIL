@@ -37,7 +37,7 @@ baz(); // <-- 1. call-site for `baz` in `global`
 ### 2.1. Default Binding
 우선 call-site 개념을 잠깐 지워버리자. 그리고
 함수가 딸랑 그대로 실행되는 경우에 this는 global을 가리키는데 이게 Default 규칙이다. 
-만약 어떠한 다른 규칙도 적용되지 않았다면 항상 Default가 적용된다고 생각하자.
+만약 어떠한 다른 규칙도 생성적용되지 않았다면 항상 Default가 적용된다고 생각하자.
 ```
 function foo() {
 	console.log( this.a );
@@ -436,19 +436,19 @@ console.log(obj); // {v:"3"}
 
 // new가 override할 수 있는 구조가 아니다. 반환된 함수에 this는 존재하지 않기 때문이다
 // 단지 입력받은 함수에 오브젝트를 apply하여 실행하고 그 결과를 반환할 뿐이다. 
-// 입력받은 함수의 구조상 어떤 값을 반환할 수도 있고 아닐 수도 있는데, 이때 return이 있어야 apply가 반환된 값을 외부 함수가 받아서 외부로 반환할 수 있다.
+// 함수는 기본적으로 어떤 값을 반환할 수도 있고 아닐 수도 있는데, 이때 return이 있어야 apply가 반환한 값을 외부 함수가 받아서 사용자에게 도달할 수 있다.
 new boundObj_f("4"); //{} 반환값이 primitive value or undefined인 경우(not object)에 생성자가 실행되며 {}가 반환된다. 이때 apply 함수는 이미 실행된 상태이다.
 console.log(obj); // {v:"4"} // obj의 값이 변경되었기 때문에 의도한데로 bind된 함수가 정상적으로 동작했다.
 new(boundObj_f); //{} 위와 같은 이유다. 
 console.log(obj); {v: undefined} obj의 v가 undefiend로 변경되었다. bind된 함수 정장적으로 동작!
 ```
 
-**정리**:
+**point 정리**:
 1. 반환 값
-- 입력한 함수가 객체를 반환하는 경우: specific `object` is returned no matter what new is used
-- 입력한 함수가 객체를 반환하지 않는 경우: `new` 키워들 사용하면 {} 빈 오브젝트를 반환한다. => 이유는 주석 참고
-
-2. 의도한 bind 실행여부
+- 함수가 apply를 반환해야지만 기존 함수가 값을 반환하는 경우 그 값이 외부로 전달된다.
+2. new 키워드
+- new 키워드를 사용하면 {} 빈 오브젝트가 생성된다. bind 함수가 반환하는 함수의 생성자에 의해 새로운 오브잭트를 반환하기 때문이다.
+3. 의도한 bind 실행여부
 - new(func), new func() 모두 bind된 함수가 실행된다. => 주석 참고(apply는 항상실행되기 때문에)
 
 **알고가기**
@@ -460,14 +460,19 @@ return function(){ ...
 ```
 2. iterable한 객체도 slice할 수 있다.
 ```
+
+--- function 내부에서
 // arguments는 iterable한 객체
+console.log(Array.isArray(argumenst)) //false
+console.log(arguments[Symbol.iterator]) // ƒ values() { [native code] }
+----
 var args = slice.call(arguments, 1);
 ```
 3. bind의 argument와 새로 생성된 함수의 argument를 concat하여 apply 하면 bind의 argument를 생성된 함수의 인자로 넘겨줄 수 있다.
 ```
 var funcArgs = args.concat(slice.call(arguments))
 ```
-4. 1번의 함수가 bind된 새로운 함수다. 이 함수가 실행되는 순간 먼저 apply함수가 실행되며 new와 함께 사용했을 때는 새로운 함수 내부에 this가 존재하지 않기 때문에 '{}' 빈 객체를 반환해야 하지만, 코드의 윗부분을 살펴보면 new와 함께 실행되는 순간 bind 함수 내부에 this가 새로 생성될 object를 가리킬 것이기 때문에 function이 아닌 관계로 에러를 발생시킨다.
+4. 1번의 함수가 bind된 새로운 함수다. 이 함수가 실행되는 순간 먼저 apply함수가 실행되며 new와 함께 사용했을 때는 새로운 함수 내부에 this가 존재하지 않기 때문에 '{}' 빈 객체를 반환해야 하지만, 코드의 윗부분을 살펴보면 new와 함께 실행되는 순간 bind 함수 내부에 this가 새로 생성될 object를 가리킬 것이기 때문에 function이 아닌 관계로 에러가 발생한다.
 
 #### 3.1.2. 2번 `new` works after bind
 ```
@@ -481,28 +486,19 @@ if (!Function.prototype.bind) (function(){
       throw new TypeError('Function.prototype.bind - what is trying to be bound is not callable');
     }
 
-    var baseArgs= ArrayPrototypeSlice.call(arguments, 1), // arguments 들
+    var baseArgs= ArrayPrototypeSlice.call(arguments, 1),
         baseArgsLength = baseArgs.length, // arguments 길이
-        fToBind = this, // bind를 부른 함수 // 바인드 될 함수
-        fNOP    = function() {}, 
-        // bind에 의해 반환될 함수
+        fToBind = this,
+        fNOP = function() {}, 
         fBound  = function() {
-          baseArgs.length = baseArgsLength; // reset to default base arguments
-          baseArgs.push.apply(baseArgs, arguments); // concat baseArgs(bind하며 받는 args), arguments(bind 이후 받는 args)
-          console.log(this)
+          baseArgs.length = baseArgsLength;
+          baseArgs.push.apply(baseArgs, arguments);
           return fToBind.apply(
-                 // 0. fNOP는 이미 bind를 호출한 함수의 prototype을 가지고 있다. fBound의 prototype은 fNOP의 객체이다.
-                 // 1. this는 fBound를 호출하는 context를 가리킨다.(bind된 함수가 불려질 때) ex) b = a.bind(), b() 에서 b()부분
-                 // => 따라서 fNOP과 this는 별개이며 this는 일반적으로 window를 가리킨다.
-                 // 2. new가 사용된다면(ex. new(bind()) ), this는 fBound의 생성자가 만들어 내는 object를 가리킨다.
-                 // => fNOP(bind된 함수)는 this(new fBound) 이다.
                  fNOP.prototype.isPrototypeOf(this) ? this : otherThis, baseArgs
           );
         };
-        console.log(new fBound)
-
-    if (this.prototype) { // 함수는 prototype을 가지고 있다. => fNOP가 함수의 prototype을 가진다. => fNOP의 생성자가 함수의 생성자가 된다.
-      // Function.prototype doesn't have a prototype property
+    if (this.prototype) { 
+		// prototype은 함수만 가지고 있기 때문에 bind를 호출하는 대상이 object이면 실행하지 않는다.
       fNOP.prototype = this.prototype;
     }
     
@@ -513,27 +509,108 @@ if (!Function.prototype.bind) (function(){
 })();
 
 function test(){};
-test1 = test.bind({"a":1});
-new test1("123");
+test1 = test.bind({"a":1}); // fNOP의 prototype에 test의 prototype을 할당한다. fBound의 prototype은 fNOP이 생성하는 객체가된다.
+new test1("123"); // fBound가 생성하는 object는 fNOP과 같다. 이 object가 this이다.
 
 ```
-**정리:**
-1. bind 함수가 호출되면.
-1-1. 코드의 마지막 부분에 `fNOP.prototype = this.prototype`를 보면 this(test)의 prototype을 fNOP의 prototype에 할당한다.
-1-2. 그 아래로 `fBound.prototype = new fNOP();`에서 fBound의 prototype은 fNOP(test)에 의해 생성되는 object와 같다.
 
-2. bind 함수가 반환한 fBound 함수가 호출되면.  
-2-1. 일반적인 호출의 경우 this는 window를 가리킨다. 따라서 fNOP(test)에 의해 생성된 객체가 아니기 때문에 otherThis를 apply함수의 argument로 넘겨준다.  
-2-2. `fNOP.prototype.isPrototypeOf(this)`를 보자. new를 통해 fBound가 호출되면 this는 생성될 객체를 바라본다. 
+#### 3.1.2.1 핵심 코드만 정리:
 
-생성될 객체는 fBound의 prototype = new fNOP() 에 의해 결정되기 때문에 new fNOP() 를 부모로 두는 객체가 생성된다.
+##### 3.1.2.1.1. 일반 bind 함수
+```
+function bind (){
+    slice = Array.prototype.slice
+    obj = arguments[0]
+    fArgs = slice.call(arguments, 1)
+    baseFunc = this
+    fBound = function(){
+        args = fArgs.concat(slice.call(arguments))
+        return baseFunc.apply(obj, args)
+    }
+    return fBound
+}
+obj = {"a":1};
+tFunc = function(){
+	this.a = 7;
+}
+boundTFunc = tFunc.bind(obj);
+// boundTFunc() // obj의 "a"가 7로 변경됨
+// new boundTFunc() // fbound의 생성자가 실행되며 빈 객체를 반환한다. 또한 apply함수도 실행되어 obj의 a도 4로 변경된다.
+```
+##### 3.1.2.1.2. new가 가능한 bind 함수
+```
+Function.prototype.bind = function() {
+    slice = Array.prototype.slice
+    obj = arguments[0]
+    fArgs = slice.call(arguments, 1)
+    baseFunc = this
+	
+    fNOP = function(){}
+    
+    fBound = function(){
+        args = fArgs.concat(slice.call(arguments))
+        return baseFunc.apply(
+            fNOP.prototype.isPrototypeOf(this) ? this : obj, args)
+    }
+	
+    fNOP.prototype = this.prototype; //1
+    fBound.prototype = new fNOP();
+    return fBound
+}
 
-![image](https://user-images.githubusercontent.com/39623897/109634785-fde1be80-7b8c-11eb-9817-f6a43a7e183c.png)
+obj = {"a":1};
+tFunc = function(){
+	this.a = 7;
+}
+boundTFunc = tFunc.bind(obj);
+// boundTFunc() // obj의 "a"가 7로 변경됨
+// new boundTFunc() // fbound의 생성자가 실행된다 이때 이미 fbound의 property는 fNOP의 객체이며 fNOP은 기존함수의 생성자를 가지고 있어서 tFunc가 생성한 객체
+```
 
-따라서 fNOP = test이고, this는 new fNOP = new test 이기 때문에 true를 반환한다. 결과적으로 apply(this, baseArgs)를 반환하는데 this가 new test이기 때문에 test가 binding된 함수가 된다.
+##### es6의 bind
+일반적으로 bound된 함수를 통해 객체를 생성하면 bound 되기전의 함수를 리턴한다.
 
-과제:
--나중에 다시 정리...-
+![image](https://user-images.githubusercontent.com/39623897/109912735-030b4e80-7cf0-11eb-950e-9c88d7e9fa2b.png)
+
+boundTfunc를 보면 일반적인 tFunc 함수이며, 단지 this만 변경되었을 뿐이다.
+
+![image](https://user-images.githubusercontent.com/39623897/109913850-10c1d380-7cf2-11eb-8cee-6e93708b59e7.png)
+
+es6의 new를 통해 생성된 객체는 `__proto__` 속성을 가지고 있다. 그리고 이 `__proto__`는 본인을 생성한 함수의 prototype을 가리킨다. 이 prototype에는 위와 같이 constructor가 존재한다.
+
+##### es5에서 bind를 대체할 때
+
+하지만 우리가 살펴본 코드는 조금 다르다. 우선 bind 함수를 통해 반환되는 fBound가 tFunc가 아니기 때문에, fBound가 생성한
+객체가 tFunc를 상속받도록 할 것이다.
+
+**고려할 사항:(new 관점)**
+1. fBound가 생성할 객체는 tFunc를 상속받은 빈 함수(fNOP)가 생성한 객체를 상속받는다. => tFunc와 연결하기 위함
+2. tFunc가 생성하는 객체를 반환하기 위해 tFunc.apply(this, args)를 사용한다. this는 fBound가 생성할 객체이다.
+
+**고려할 사항:(함수 실행 관점)**
+1. tFunc.apply(obj, args)를 실행한다. => bound될 obj를 apply로 실행  
+
+**상세 설명**
+1. fBound 함수가 실행될 때 tFunc의 apply 메소드를 실행한다.
+2. fBound 함수는 tFunc가 아니기 때문에 구조적으로 tFunc와 연결시켜야 한다.
+3. 상속 개념을 생각해 볼 수 있다.
+4. fBound의 prototype을 tFunc가 생성한 객체로 바로 지정하면 fBound에 의해 생성될 객체의
+__proto__는 fBound의 prototype을 바라보기 때문에 tFunc가 생성한 객체 자체가 `__proto__`에 할당되게 된다.
+
+즉, 만약 tFuc가 생성한 객체에 속성이 들어있다면 fBound가 생성할 객체의 `__proto__`에도 그 속성이 존재하기 때문에
+주의해야한다.
+5. 4번의 문제를 회피하기 위해 빈 함수 fNOP을 만들어 fNOP의 prototype을 tFunc의 prototype으로 설정한다. 그 다음 
+fBound의 prototype을 fNOP이 생성한 객체로 지정하면 
+
+fBound가 생성하는 객체의 `__proto__`가 fNOP의 객체를 바라보며 fNOP의 객체의 `__proto__`는 다시 tFunc의 prototype을 바라보는 구조가
+된다.
+
+6. 이제 fBound가 생성하는 객체의 속성은 비어있는 상태다. 따라서  fFunc가 생성할 객체의 속성과 같이 할당해야한다.
+7. new를 통해 fBound가 실행되면 그 내부의 this는 새롭게 생성되는 객체가 된다.
+8. 따라서 tFunc.apply(this, args) 를 하게되면 tFunc 내부의 this는 생성되는 객체를 바라보기 대문에 생성될 객체의 속성은 tFunc 객체 구조와 같아진다.
+9. fBound가 어떤 객체를 반환하면 그 객체가 fBound가 된다. 하지만 어떠한 상속도 없는 그 객체 자체가 생성되기 때문에 옳바른 방법이 될 수 없다.
+하지만 tFunc.apply을 반환하는 구조가 되는 이유는 
+tFunc가 어떤 객체를 반환하는 경우에 fBound가 이 객체를 받아 다시 반환하여 tFunc가 반환한 객체를 생성하기 위함이다. 
 
 **왜 new가 bind를 overriding 할 수 있어야 할까?**
 bind의 argument는 기존 함수의 매개변수를 앞에서 부터 차례대로 고정시킨다.
