@@ -3,8 +3,8 @@
 그 동안 글로벌한 서비스에 대해 따로 깊이 있게 생각해 보지 않았는데, 이번 기회에 글로벌 서비스를 위한 기술로 어떤 것들이 쓰이는지 찾아보려한다. HTTP/2는 기존 HTTP/1.1의 단점을 보완한 것으로 글로벌 네트워크에서 RTT(Round Trip Time)를 개선할 수 있는 방법 중 하나다. 이번 시간에는 HTTP/2를 알아보기 전에 HTTP의 바탕이되는 TCP/IP 개념을 다시 한번 짚고 넘어가려고 한다.
 
 ## 4계층
-LAN은 다들 한번 들어봤을 것이다. 가정에서 보통 KT, LG, SK 등의(ISP)의 인터넷망을 결제해서 사용한다. 
-이 ISP에서 제공하는 공인 IP는 우리가 자주보는 공유기에 연결되고, 공유기는 여러 개의 사설 IP를 생성한다. 
+우리는 KT, LG, SK 등의(ISP)의 인터넷망(WAN)을 결제해서 사용한다. 
+이 ISP에서 제공하는 공인 IP는 공유기에 연결되고, 공유기는 여러 개의 사설 IP를 생성한다. 
 PC 혹은 모바일 디바이스마다 연결된 LAN 혹은 WIFI를 통해 사설 IP가 부여되고 이로서 우리는 기기마다 고유의 IP를 가지고 인터넷을 사용할 수 있게 된다. 그렇다면 이 네트워크 구조에서 IP는 무엇이며 어떤 구조를 통해 데이터를 주고 받을까? TCP/IP 4 Layer를 살펴보면 그 원리를 파악할 수 있다.
 
 4 Layer. Application Layer : http, stp, ftp ... (응용프로그램에서 서버로 데이터를 요청하고 해석하기 위한 규칙을 지정하는 계층),  
@@ -54,7 +54,7 @@ TCP에서 주고 받는 Segment는 TCP header와 Data로 나누어지는데 TCP 
 ##### 4.1.2 연결 과정
 - 1. 위의 그림을 보면 Client가 SYN을 SERVER로 넘겨주게 되는데 Server는 이 SYN이 넘어왔음을 확인하여 Client가 연결을 원하는지 알아차린다.
 - 2. 그 다음으로 Server는 Client로 SYN/ACK을 보내게 된다. 그 이유는 Client는 SYN을 보내고 난 후 Server가 그 SYN을 잘 받았는지 알 수가 없다. 따라서 ACK은 SERVER가 Client에게서 데이터(연결요망)를 잘 받았다고 알리기 위함이고 SYN을 같이 보냄으로써 Server 또한 통신하고 싶다는 메세지를 Client에게 확인시키기 위함이다.
-- 3. 마찬가지로 다시 Clinet가 Server에게 ACK을 보낸다. Client가 Server의 SYN/ACK을 잘 받았다고 알리기 위해서이다.
+- 3. 마찬가지로 다시 Client가 Server에게 ACK을 보낸다. Client가 Server의 SYN/ACK을 잘 받았다고 알리기 위해서이다.
 이 3가지 단계를 거치면 Client와 Server 사이에 연결이 수립되고, 그 이후로는 아래와 같이 Segment(DATA+SYN)를 보내고 ACK을 보내기를 반복한다.
 ```
 Client                           Server  
@@ -83,9 +83,9 @@ UDP는 짧은 레이턴시를 우선적으로 생각하는 방법이다. 즉 빠
 
 #### 용어정리
 ##### 데이터 단위(PDU[Protocol Data Unit])
-- data: 5 Layer Apllication Layer 에서 http 프로토콜에 의해 http 헤더와 바디 형태로 데이터가 만들어진다. 헤더에는 GET/POST 메소드와 URL 등의 메타정보가 담겨 있다.
-- segment: 4 Layer Transport Layer 에서 TCP 프로토콜에 의해 4Layer에서 만들어진 데이터 앞에 TCP 헤더가 붙는다. TCP 헤더에는 클라이언트와 서버의 port 넘버가 담겨있다. 이렇게 만들어진 데이터를 "Segment" 라고 한다. Segment라고 불리는 이유는 한번에 전송할 수 있는 데이터의 양이 정해져있는데 이를 MTU(Maximum Transfer Unit)이라고 한다. TCP의 경우 Segment화 과정에서 큰 데이터가 MTU보다 작은 데이터로 분할되며, 각 데이터에 순서를 지정해 수신자가 데이터를 순차적으로 받을 수 있게 한다.
-- Packet: 3 Layer Internet Layer 에서 IP 프로토콜에 의해 Segment 앞에 IP 헤더가 붙는다. IP 헤더에는 클라이언트와 서버의 IP 주소가 담겨있다.
+- data: 5 Layer(Apllication Layer) 에서 http 프로토콜에 의해 http 헤더와 바디 형태로 데이터가 만들어진다. 헤더에는 GET/POST 메소드와 URL 등의 메타정보가 담겨 있다.
+- segment: 4 Layer(Transport Layer) 에서 TCP 프로토콜에 의해 4Layer에서 만들어진 데이터 앞에 TCP 헤더가 붙는다. TCP 헤더에는 클라이언트와 서버의 port 넘버가 담겨있다. 이렇게 만들어진 데이터를 "Segment" 라고 한다. Segment라고 불리는 이유는 한번에 전송할 수 있는 데이터의 양이 정해져있는데 이를 MTU(Maximum Transfer Unit)이라고 한다. TCP의 경우 Segment화 과정에서 큰 데이터가 MTU보다 작은 데이터로 분할되며, 각 데이터에 순서를 지정해 수신자가 데이터를 순차적으로 받을 수 있게 한다.
+- Packet: 3 Layer(Internet Layer) 에서 IP 프로토콜에 의해 Segment 앞에 IP 헤더가 붙는다. IP 헤더에는 클라이언트와 서버의 IP 주소가 담겨있다.
 이렇게 만들어진 데이터를 "Packet"이라고 한다.
 - Frame: 1,2 Layer(Network Access Layer) 에서 Segment 앞에 클라이언트와 서버의 MAC주소(Ethernet 헤더)가 붙고, 이렇게 만들어진 데이터를 "Frame"이라고 한다.
 
@@ -96,7 +96,7 @@ UDP는 짧은 레이턴시를 우선적으로 생각하는 방법이다. 즉 빠
 - MAC address: 하드웨어가 가지고있는 물리적인 주소.
 #### 데이터 전송 과정(TCP)
 0. server와 client의 연결 수립
-1. Client에서 로그인 DATA를 입력하고 로그인 버튼을 누르면 5Layer에서는 HTTP header(POST, HOST....) + DATA 형태로 다음 레이어로 갈 준비를 마친다.
+1. client에서 로그인 DATA를 입력하고 로그인 버튼을 누르면 5Layer에서는 HTTP header(POST, HOST....) + DATA 형태로 다음 레이어로 갈 준비를 마친다.
 2. 4Layer에서는 Port번호와 함께 랜덤의 SYN 넘버를 생성하여 TCP header에 저장하고 그 TCP header + DATA 형태로 Segment를 만든다.
 3. 3Layer에서는 Ip header(송수신자의 ip주소) + Segment 형태로 Packet을 만든다.
 4. 2Layer와 1Layer를 거쳐 Ethernet header(Mac 주소) + Packet 형태로 Frame을 만들고 Frame은 아날로그 신호로 변경된다.
@@ -127,4 +127,5 @@ Frame에 담긴 LAN카드의 mac address 를 확인하여 Server로 진입한다
 [TCP](https://namu.wiki/w/TCP)
 
 
-
+## 복습
+- 1차: 1시간 30분
