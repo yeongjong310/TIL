@@ -124,24 +124,16 @@ for (var i = 1; i <= 5; i ++) {
     }, i*1000 );
 }
 ```
-closure를 설명할 때 반복문은 매우 유용하게 쓰인다. 위 코드를 실행하면 의도한 바와 달리 6이 5번 출력된다.
-그 이유는 반복문이 모두 동작한 후에 closure가 적용되며 timer은 lexical scope 외부인 setTimeout 내부에서 실행된다. 이때는 모든 i 가 global 영역의 i인 6을 가리킨다.
-따라서 for문이 끝난 시점에서 globla 영역의 i는 이미 6이기 때문에 6이 5번 출력되는 것이다.
+위 코드를 실행하면 의도한 바와 달리 6이 5번 출력된다.
+그 이유는 간단히 말해서 console.log의 파라미터로 넘겨준 i가 global에 존재하기 때문이다.
+setTimeout은 현재 콜스택에 어떤 명령도 존재하지 않을 때 실행되기 때문에 실질적으로, for문이 모두 실행된 후 setTimeout이 실행된다. 따라서 i는 6이 된 상태로 출력되는 것이다.
+
+이를 해결하기 위한 방법으로 closure를 적용할 수 있다. 무슨말이가 하면 전역함수인 timer를 특정 scope 범위 내에서 선언하고 외부(setTimeout)로 주소를 넘겨주어 실행하면 closure 특성에 의해 내부 scope의 변수 i를 참조할 수 있다는 말이다.
+
 
 **note:** setTimeout은 for문이 끝나면 실행되기 때문에 setTimeout(..., 0)일지라도 6이 5번 출력된다.
 
-이 문제를 해결하기 위해 배웠던 closure를 응용해보자. 
-우선 i가 global을 가리키지 않고 별개의 scope 내에 존재해야 한다. 아래처럼 IIFE로 함수를 실행시켜 스코프를 생성할 수 있다.
-```
-for (var i = 1; i <= 5; i ++) {
-  (function(){
-    setTimeout( function timer() {
-      console.log( i );
-    }, i * 1000 );
-  })();
-}
-```
-IIFE는 새로운 scope를 생성한다.(함수가 실행되기 때문에) 하지만 이 scope에서도 i는 존재하지 않고, 외부 영역인 global에서 i를 호출하기 때문에 역시 6이 5번 출력되는 같은 결과를 낳는다.
+우선별개의 scope를 생성해야한다. 아래처럼 setTimeout 밖으로 함수를 wrap한다. 이 함수를 실행시키며 인자로 i를 넣어주면 그 timer가 실행될 때 i를 function 내부에서 찾게된다.
 
 ```
 for (var i = 1; i <= 5; i ++) {
@@ -187,7 +179,7 @@ var foo = CoolModule();
 foo.doSomething(); // cool
 foo.doAnother(); // 1 ! 2 ! 3
 ```
-위 코드가 바로 우리가 부르는 module의 실체다. inner functions를 메소드로 구성한 object를 반환한다. 그리고 outer function을 실행하면
+위 코드가 바로 우리가 부르는 module의 실체다. CoolModule 함수는 내부 메소드들(doSomeThing, doAnother)을 속성값으로 가지는 object를 반환한다. 그리고 CoolModule function을 실행하면
 module instance가 생성되어 foo 변수에서 그 객체의 주소를 참조한다. 여기서 부터 closure가 적용된다. 이미 outer function은 종료되었기 때문에 반환한 object를 더 이상 참조할 수 없어야 하지만 closure 덕분에 참조할 수 있다. 그리고 이 object의 메소드를 통해 
 foo에 저장된 CoolModule instance에 접근하는 것도 closure다.
 
@@ -415,7 +407,7 @@ const testModules = require('./Module')
 console.log(testModules) // { MyModules: { define: [Function: define], get: [Function: get] }, test: {} }
 ```
 ## 6. Review
-기존에 closure는 단순히 함수를 반환하는 경우에 lexical scope가 보존되는 것으로만 알고 있었는다. 하지만 closure는 scope와 연관된 js의 근본이되는 대단한 녀석이었다. lexical scope에 어떤 값이든 외부로 반환되면 closure가 적용되었다고 볼 수 있다.
+기존에 closure는 단순히 함수를 반환하는 경우에 lexical scope가 보존되는 것으로만 알고 있었는다. 하지만 closure는 scope와 연관된 js의 근본이되는 대단한 녀석이었다. lexical scope에 어떤 값이든 외부로 반환되면 closure 원리가 적용되었다고 볼 수 있다.
 
 array, object 또한 lexical scope를 벗어났을 때 기존의 주소를 계속 참조한다.
 ```
