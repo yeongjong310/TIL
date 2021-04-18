@@ -2,11 +2,11 @@ ch3. Function vs Block scope
 
 
 # 1. Scope From Functions
-js 는 기본적으로 Functiona 마다 scope를 생성한다.
+js 는 기본적으로 Function 마다 scope를 생성한다.
 
 scope 덕분에 각 영역은 서로의 영역을 침범하지 않는 고유의 식별자를 가지고 있을 수 있다.
 
-예를들어 아래 코드는 2개의 function이 있기 때문에 global을 포함한 총 3개의 scope 영역이 있다고 생각하면 된다.
+예를들어 아래 코드를 보면 2개의 function에 고유한 scope가 존재하며, 추가로 global scope을 포함하면 총 3개의 scope 영역으로 나뉜다.
 ```
 function foo(a) {
 	var b = 2;
@@ -24,7 +24,7 @@ function foo(a) {
 ```
 global은 foo를, foo에는 `a,b,c`, `bar`를, bar에는 bar만의 식별자를 가지게 된다.
 
-이렇게 scpoe를 나누면 좋은 점을 소개한다.
+global이 foo, a,b,c, bar 를 모두 가지고 있으면 어느 위치에서든 접근할 수 있는데, 이렇게 scpoe를 나눠서 접근에 제한을 둔 이유가 무엇일까? 아래 2번 색션에서 살펴보자.
 
 # 2.Hiding In Plain Scope
 # 2.1. hiding in plain scope
@@ -44,10 +44,12 @@ var b;
 
 doSomething( 2 ); // 15
 ```
+일반적으로 개발자는 함수 키워드를 작성하고 그 안에 코드를 추가하는 방식으로 함수를 사용한다.
+그런데 생각을 전환해보면 코드를 작성한 영역을 함수로 묶었다는 의미가 된다. 이렇게 기능단위로 코드를 함수로 묶어주면 가시적으로 기능을 구별할 수 있을 뿐만아니라 함수 내부의 코드는 함수 외부로부터 보호할 수 있게 된다. 간단하게 함수를 부를 떄만 사용하도록 제한할 수 있다는 뜻이 된다.
 
-위 코드를 보면 b와 doSomethingElse는 global에 정의되었고 어디서든 접근할 수 있다.
-하지만 b와 doSomethingElse는 doSomething에서만 접근하고 있기 때문에, 굳이 global 영역에 정의해서 모든 scope에 영향을 미치는 것은 낭비다.
-추후에 어떤 일이 발생할지 모르기 때문에 필요한 곳에서만 변수를 사용할 수 있도록 변수의 접근을 제한하는 것은 매우 중요하다.
+위 코드를 예시로 보면 b와 doSomethingElse는 global에 정의되었고 어디서든 접근할 수 있다.
+하지만 b와 doSomethingElse는 doSomething에서만 접근하고 있기 때문에, global에 정의하면 doSomething이 끝난 후에도 메모리에 존재하게 되고, 이는 곧 메모리를 낭비하는 것이다.
+따라서 필요한 곳에서만 변수를 사용할 수 있도록 변수의 접근을 제한하는 것은 매우 중요하다.
 
 ```
 function doSomething(a) {
@@ -89,8 +91,8 @@ foo();
 function 내부의 `i = 3;`을 `var i = 3;`으로 변경하면 i는 bar scope에 저장되며 문제가 해결된다.
 
 ## 2.2.1 Global "Namespaces"
-library 같은 경우 많은 함수와 변수를 포함하고 있다. 따라서 다수의 library를 동시에 import하는 경우 의도치 않게 중복되는 identifier가
-생길 것이다. 이때 사용할 수 있는 방법은 함수와 변수들을 object의 속성으로 할당하고 이 object를 global scope의 변수에 할당하는 것이다.
+library 같은 경우 다수의 메소드와 변수를 포함하고 있다. 만약 다수의 library를 동시에 import하는 경우 의도치 않게 중복되는 식별자들이 global에서 공유될 수 있다.
+이를 방지하기 위해서 함수와 변수들을 object의 속성으로 할당하고 이 object를 global scope에 할당하는 것이다.
 ```
 var MyReallyCoolLibrary = {
 	awesome: "stuff",
@@ -102,10 +104,10 @@ var MyReallyCoolLibrary = {
 	}
 };
 ```
-위 예제는 MyReallyCoolibarary 안에 object를 할당했다. 이제 MyReallyCoolibarary를 통해서만 각 프로퍼티, 메서드에 접근할 수 있기 때문에 global에 노출되지 않아 충돌을 방지 할 수 있다.
+위 예제는 MyReallyCoolibarary 안에 object를 할당했다. 이제 MyReallyCoolibarary를 통해서만 각 프로퍼티, 메서드에 접근할 수 있기 때문에 내부 식별자가 global에 노출되지 않아 충돌을 방지 할 수 있다.
 
 # 3. Functions As Scopes
-지금까지 함수에 따라 생성되는 scope에 대해 알아봤다. 
+지금까지 함수와 함께 생성되는 scope에 대해 알아봤다. 
 ```
 var a = 2;
 
@@ -119,7 +121,7 @@ foo(); // <-- and this
 
 console.log( a ); // 2
 ```
-위와 같이 함수를 선언하는 방식으로 말이다. 함수를 선언하고 실행하는 가장 큰 이유는 선언한 함수를 재사용하기 위해서다. 하지만 재사용 할 필요가 없다면, global에 선언된 foo는 scope 영역을 교란시킬 뿐이다. 이 문제를 해결할 아주 좋은 방법이 있다.
+위와 같이 함수를 선언하고 실행하는 가장 큰 이유는 선언한 함수를 재사용하기 위해서다. 하지만 재사용 할 필요가 없다면, global에 선언된 foo는 scope 영역을 교란시킬 뿐이다. 이 문제를 해결할 아주 좋은 방법이 있다.
 
 ```
 var a = 2;
@@ -134,16 +136,16 @@ var a = 2;
 console.log( a ); // 2
 ```
 
-이렇게 함수 선언문을 `()`로 감싸고 끝에 함수를 실행하는 `()`를 붙이면 foo는 global에 노출지 않고, foo를 선언함과 동시에 실행된다.
+이렇게 함수 선언문을 `()`로 감싸고 끝에 함수를 실행하는 `()`를 붙이면 foo는 global에 노출되지 않고, foo를 선언함과 동시에 실행된다.
 이렇게 바로 실행하는 함수를 IIFE(Immediately Invoked Function Expression) 라고하며 이것은 함수 표현식의 일종이다.
-함수 표현식의 특징중 하나는 function의 이름이 해당 scope의 identifier(식별자)로 등록되지 않는다는 점이다. 앞서 말한것 처럼 IIFE로 선언한 함수의 이름도 scope의 identifier로 등록되지 않는다.
+함수 표현식의 특징중 하나는 function의 이름이 해당 scope의 identifier(식별자)로 등록되지 않는다는 점이다. 따라서 IIFE로 선언한 함수도 scope의 identifier로 등록되지 않는다.
 
 **note:** 표현식과 선언문을 구분하는 쉬운 방법은 라인의 시작이 function인지 아닌지 확인하는 것이다.
 
 ```
 var a = function b() {}
 ```
-일반적인 함수 표현식을 보면 function의 이름은 `b` 이지만 scope에 등록되는 identifier는 `a`다.
+위 처럼 변수에 함수를 삽입하는 방식이 일반적인 함수 표현식이다. function의 이름은 `b` 이지만 scope에 등록되는 identifier는 `a`다.
 
 ## 3.1. Anonymous vs. Named
 함수 표현식은 이름없이 사용할 수 있고, 함수 선언문은 불가능하다. 그리고 이름없는(Anonymous) 함수는 일반적으로 이름있는 함수보다 빠르고
@@ -243,7 +245,7 @@ i는 for문 내에서만 사용하려고 했지만 의도와는 다르게 global
 이때 우리는 block 단위로 scope를 지정할 수 있다. block scope란 {} 중괄호를 감싸는 블록이 하나의 scope가 되어 변수범위를 제한하는 것이다.
 
 ## 4.1. `with`
-이전 ch2에서 배웠던 `with`를 다시 생각해보자. `with`는 새로운 scope를 생성한다. 그리고 `with` 내의 변수들은 lexical scope가 적용된다. 따라서 `b = 3`의 경우 스코프 내에 b가 없기 때문에 선언한 변수는 외부 scope로 빠져나가 버린다. 즉 입력된 test scope와 별개로 새로운 block scope를 생성한다.(let, var는 적용되지 않는다.)
+이전 ch2에서 배웠던 `with`를 다시 생각해보자. `with`는 입력받은 인자의 scope에 존재하는 변수들을 with 내부의 새로운 scope로 모두 이동시킨다. 즉 with의 block이 기준이 되는 새로운 scope가 되고, 내부에서 사용했던 a라는 식별자는 외부에서 사용할 수 없게 된다. 
 ```
 var test = { a: 1 }
 with(test){
@@ -251,15 +253,14 @@ with(test){
     b = 3;
 }
 
-console.log( test.b ); // undefined
-console.log( b ); // 3
+console.log(a); // Uncaught ReferenceError: a is not defined
 ```
 
 ## 4.2. `try/catch`
 ES3부터 지원하는 `try/catch`도 block scope를 지원한다.
 ```
 try{
-	var test = "test";
+    var test = "test";
     undefined(); // undefined는 함수가 아니기 때문에 error 발생
 } catch (err) {
 	console.log( err );
@@ -272,7 +273,7 @@ console.log( err ); //ReferenceError: `err` not defined
 **note:** 어떤 linter(코드style을 분석해서 개발자에게 style적인 문제를 지적한다.)에서는 하나의 scope에 두 개의 try/catch 문을 사용하고 catch문에 똑같은 변수 이름을 사용하면 마치 식별자가 중복된 것 처럼 인식하는 문제가 있다. 이를 해결하기 위해 개발자들은 `err1, err2`와 같은
 형태로 변수를 선언한다.
 
-## 4.3. `let`
+## 4.3. `let`(es6)
 이제 본격적으로 block scope와 관련되 `let`을 살펴보자.
 어떤 {} 블록이든 내부에서 let으로 변수를 선언하면 그 변수는 해당 block에서만 사용할 수 있게 된다.  
 
@@ -379,4 +380,9 @@ btn.addEventListener( "click", function click(evt){
 }, /*capturingPhase=*/false );
 ```
 
-
+## 5. Review
+1. Scope를 사용하는 이유는 - 가지이다.
+	- 서로 다른 기능들이 동일한 키워드를 사용할 때 충돌을 방지하기 위해서
+	- 메모리의 낭비를 줄이기 위해서
+2. Block Scope와 Function Scope의 차이
+	- Scope는 기본적으로 키워드를 제한하기 위해 고안되었다. Js는 기본적으로 함수 단위로 스코프를 생성한다. 하지만 더 세부적으로 스코프의 범위를 제한할 필요가 있다면 Block 단위의 Scope를 사용할 수 있다.
