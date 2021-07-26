@@ -4,7 +4,7 @@
 
 ## Contents
 1. [Front_End](https://github.com/yeongjong310/TIL/tree/main/Front_End)
-    - [brower](https://github.com/yeongjong310/TIL/tree/main/Front_End/browser/)
+    - [browser](https://github.com/yeongjong310/TIL/tree/main/Front_End/browser/)
     - [js](https://github.com/yeongjong310/TIL/tree/main/Front_End/js)
 3. [NetWork](https://github.com/yeongjong310/TIL/tree/main/network)
 4. [수학](https://github.com/yeongjong310/TIL/tree/main/%EC%88%98%ED%95%99)
