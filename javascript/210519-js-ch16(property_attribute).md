@@ -10,6 +10,8 @@ const obj = {};
 console.log(obj.__proto__);
 ```
 
+> 참고: js엔진은 성능상 대부분 c++로 구현되어있다. js문법(text)을 js엔진이 해석해서 c++의 결과물을 만들어낸다.(ex. 객체) 이때 js엔진이 필요로하는 메서드 혹은 값들을 객체의 프로퍼티로 정의하는데 이러한 것들을 내부 슬롯 혹은 내부 메소드라고한다.
+
 ## 2. 프로퍼티 어트리뷰트와 프로퍼티 디스크립터 객체
 자바스크립트 엔진은 프로퍼티를 생성할 때, 프로퍼티 `상태`를 나타내는 `프로퍼티 어트리뷰트`를 기본 값으로 자동 정의한다.
 프로퍼티 상태는 프로퍼티 값(value), 값의 갱신 여부(writable), 열거 가능 여부(enumerable), 재정의 가능 여부(configurable) 4가지를 말한다.
@@ -108,7 +110,7 @@ person.lastName = 'lee';
 console.log(person.lastName) // lee
 ```
 
-### 5.1. 접근자 프로퍼티 정의
+### 4.2. 접근자 프로퍼티 정의
 
 - Object.defineProperty
 ```js
@@ -157,7 +159,7 @@ Object.defineProperties(person, {
 });
 ```
 
-## 5. 객체 변경 방지
+## 5. 객체 변경 방지(프로퍼티 값 변경 불가)
 객체는 변경 가능한 값이다. 재할당 없이 프로퍼티 접근 연산자를 사용하거나, Object.defineProperty 또는 Object.definePropeties로 직접 변경할 수 있다. 
 
 객체의 변경을 방지하는 메서드를 제공한다.
@@ -168,7 +170,7 @@ Object.defineProperties(person, {
 |객체 밀봉(프로퍼티 값 쓰기, 읽기 가능)|Object.seal|X|X|O|O|X|
 |객체 동결(프로퍼티 읽기 외 불가능)|Object|X|X|O|X|X|
 
-### 5.1. 객체 확장 금지(새 프로퍼티 동적 추가 불가능)
+### 5.1. 객체 확장 금지(새 프로퍼티 동적 추가 불가)
 ```js
 const person = {};
 Object.preventExtensions(person);
@@ -205,5 +207,5 @@ person.name = 'Kim';
 console.log(person); // {name: "Kim"}
 ```
 
-### 5.3. 객체 동결(읽기만 가능)
+### 5.3. 객체 동결(프로퍼티 값 읽기만 가능)
 Object.freeze를 사용하면 객체의 프로퍼티를 참조해서 읽기만 가능하다.
