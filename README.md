@@ -1,3 +1,4 @@
+![build](https://github.com/yeongjong310/TIL/actions/workflows/hello.yml/badge.svg)
 # TIL
 
 오늘 하루 배운 것, 기억하고 싶은 내용을 정리합니다.
