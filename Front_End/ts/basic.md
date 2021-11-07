@@ -17,7 +17,7 @@ tsc라는 명령어를 통해 ts를 js로 컴파일 할 수 있다.
 tsc hello.js
 ```
 
-### 2.1 옵션
+### 2.1. 옵션
 > --target: 컴파일할 es 버전을 지정한다.
 ```cmd
 tsc hello.js --target: es5
@@ -95,3 +95,64 @@ console.log(util_js_1["default"](1, 2));
 ```
 
 ## 4. 타입
+### 4.1. annotation
+
+변수명: 타입
+
+```js
+// number type
+function add(a: number, b: number) {
+  return a + 1;
+}
+```
+
+> 참고: 매개변수의 경우 타입을 지정하지 않거나, 변수를 할당없이 선언만 한 경우 암묵적으로 any 타입이 지정된다.
+
+
+```js
+// string type
+let test: string = 'My name is tory';
+```
+
+```js
+// boolean
+let test: boolean = true;
+```
+
+```js
+// undefined
+let test: undefined = undefined;
+```
+
+```js
+// null
+let test: null = null;
+```
+
+```js
+// symbol
+let test: symbol = Symbol('test');
+```
+
+```js
+// object
+let test1: object = {};
+test = { key: value };
+
+let test2: object = {
+  a: 1,
+  b: 2,
+};
+
+test2 = {}; // 객체
+test2 = [1, 2]; // 배열도 객체이기 때문에 할당 가능
+```
+
+### 4.2. 추론
+```js
+let c = 100;
+c = '113' // error => 변수 c에 타입을 지정하지 않았지만, ts는 c에 숫자가 할당되었음을 추론하고 c number외 값이 할당되면 에러를 일으킨다.
+```
+
+
+
